@@ -3,6 +3,7 @@ package cn.xiaoxige.accountcomponent.api
 import cn.xiaoxige.accountapi.IAccountComponentInitApi
 import cn.xiaoxige.accountcomponent.AsApplicationAccountApplication
 import cn.xiaoxige.serviceassistantcore.IService
+import cn.xiaoxige.serviceassistantcore.annotation.Service
 
 /**
  * @author xiaoxige
@@ -11,6 +12,7 @@ import cn.xiaoxige.serviceassistantcore.IService
  * email: xiaoxigexiaoan@outlook.com
  * desc: 账户组价初始化
  */
+@Service
 class AccountComponentInitApiImpl : IService<IAccountComponentInitApi>, IAccountComponentInitApi {
     /**
      * 使用方提供

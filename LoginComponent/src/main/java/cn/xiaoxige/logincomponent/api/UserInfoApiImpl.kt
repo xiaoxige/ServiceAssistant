@@ -3,6 +3,7 @@ package cn.xiaoxige.logincomponent.api
 import cn.xiaoxige.loginapi.IUserInfoApi
 import cn.xiaoxige.logincomponent.UserInfo
 import cn.xiaoxige.serviceassistantcore.IService
+import cn.xiaoxige.serviceassistantcore.annotation.Service
 
 /**
  * @author xiaoxige
@@ -11,6 +12,7 @@ import cn.xiaoxige.serviceassistantcore.IService
  * email: xiaoxigexiaoan@outlook.com
  * desc: 用户信息
  */
+@Service
 class UserInfoApiImpl : IService<IUserInfoApi>, IUserInfoApi {
     /**
      * 使用方提供

@@ -12,4 +12,29 @@ java {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation gradleApi()
+    implementation localGroovy()
+
+    implementation 'com.android.tools.build:gradle:4.1.2'
+    implementation 'cn.xiaoxige.serviceassistantplugin:core:1.0.0'
+}
+
+group = 'cn.xiaoxige.serviceassistantplugin'
+archivesBaseName = 'service-assistant-plugin'
+version = '1.0.0'
+
+allprojects {
+    repositories {
+        maven {
+            url uri('../plugin')
+        }
+    }
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri('../plugin'))
+        }
+    }
 }

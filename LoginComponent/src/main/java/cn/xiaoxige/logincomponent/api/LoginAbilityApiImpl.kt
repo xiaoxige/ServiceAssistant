@@ -4,6 +4,7 @@ import android.content.Context
 import cn.xiaoxige.loginapi.ILoginAbilityApi
 import cn.xiaoxige.logincomponent.LoginActivity
 import cn.xiaoxige.serviceassistantcore.IService
+import cn.xiaoxige.serviceassistantcore.annotation.Service
 
 /**
  * @author xiaoxige
@@ -12,12 +13,15 @@ import cn.xiaoxige.serviceassistantcore.IService
  * email: xiaoxigexiaoan@outlook.com
  * desc: 登录输出能力的实现
  */
+@Service
 class LoginAbilityApiImpl : IService<ILoginAbilityApi>, ILoginAbilityApi {
 
     /**
      * 使用方提供
      */
-    override fun getService(): ILoginAbilityApi = LoginAbilityApiImpl()
+    override fun getService(): ILoginAbilityApi {
+        return LoginAbilityApiImpl()
+    }
 
     /**
      * 登录

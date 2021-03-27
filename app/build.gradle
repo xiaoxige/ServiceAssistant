@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'service-assistant'
 }
 
 android {
@@ -36,6 +37,7 @@ dependencies {
 
     // 服务助手
     implementation project(':ServiceAssistantCore')
+    implementation project(':AppApi')
 
     // 登录组件
     if (loginComponentIsLibrary) {

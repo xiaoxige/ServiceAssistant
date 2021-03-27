@@ -9,5 +9,4 @@ package cn.xiaoxige.serviceassistantcore.annotation
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Service(val isSingleCase: Boolean = true) {
-}
+annotation class Service
