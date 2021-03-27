@@ -1,0 +1,4 @@
+include ':app'
+include ':ServiceAssistantCore'
+include ':ServiceAssistantPlugin'
+rootProject.name = "ServiceAssistant"
