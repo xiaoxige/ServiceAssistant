@@ -1,3 +1,5 @@
+include ':AccountComponent'
+include ':AccountApi'
 include ':LoginComponent'
 include ':LoginApi'
 include ':app'
