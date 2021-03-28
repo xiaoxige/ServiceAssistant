@@ -22,7 +22,7 @@ object Service {
 
     }
 
-    fun <T> getService(): T {
+    fun <T> getService(clazz: Class<T>): T? {
         TODO()
     }
 }
