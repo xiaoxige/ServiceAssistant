@@ -3,12 +3,12 @@ package cn.xiaoxige.serviceassistantplugin.transform
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.android.utils.FileUtils
-import org.gradle.internal.impldep.org.apache.commons.codec.digest.DigestUtils
+import org.apache.commons.codec.digest.DigestUtils
 import java.io.File
 import java.io.FileOutputStream
-import java.io.OutputStream
 import java.util.jar.JarFile
 import java.util.jar.JarOutputStream
+import org.apache.commons.io.IOUtils
 import java.util.zip.ZipEntry
 
 /**
@@ -27,7 +27,7 @@ class ServiceAssistantTransform : Transform() {
      * unique per variant.
      */
     override fun getName(): String {
-        return "service-assistant-transform"
+        return "ServiceAssistantTransform"
     }
 
     /**
@@ -60,6 +60,7 @@ class ServiceAssistantTransform : Transform() {
 
     override fun transform(transformInvocation: TransformInvocation?) {
         super.transform(transformInvocation)
+        println("transform start.")
         val inputs = transformInvocation?.inputs ?: return
         val outputProvider = transformInvocation.outputProvider
 
@@ -76,6 +77,8 @@ class ServiceAssistantTransform : Transform() {
                 handleDirInput(dirInput, outputProvider)
             }
         }
+
+        println("transform end.")
     }
 
     private fun handleDirInput(
@@ -87,7 +90,7 @@ class ServiceAssistantTransform : Transform() {
         val dirFile = dirInput.file ?: return
         if (dirFile.isDirectory) {
             dirFile.listFiles()?.forEach { file ->
-                println(file.name)
+                println("dir -> ${file.name}")
             }
         }
 
@@ -111,16 +114,34 @@ class ServiceAssistantTransform : Transform() {
 
         val jarFile = JarFile(file)
         val entries = jarFile.entries()
-        val jos = JarOutputStream(FileOutputStream(tempFile))
-        jos.use { jos ->
+        val outputStream = JarOutputStream(FileOutputStream(tempFile))
+        outputStream.use { jos ->
             while (entries.hasMoreElements()) {
                 val jarEntity = entries.nextElement()
                 val jarName = jarEntity.name
                 val zipEntity = ZipEntry(jarName)
-                
+                val inputStream = jarFile.getInputStream(zipEntity)
+                if (jarName.endsWith(".class") && !jarName.startsWith("androidx/")
+                    && !jarName.contains("R$")
+                    && !jarName.contains("R.")
+                ) {
+                    println("jar -> $jarName")
+                }
+                jos.putNextEntry(zipEntity)
+                inputStream.use {
+                    jos.write(IOUtils.toByteArray(it))
+                }
+                jos.closeEntry()
             }
         }
 
+        jarFile.close()
+        val dest = outputProvider.getContentLocation(
+            name,
+            jarInput.contentTypes, jarInput.scopes, Format.JAR
+        )
+        FileUtils.copyFile(tempFile, dest)
+        tempFile.delete()
     }
 
 }

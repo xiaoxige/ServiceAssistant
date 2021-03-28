@@ -40,12 +40,12 @@ dependencies {
     implementation project(':AppApi')
 
     // 登录组件
-    if (loginComponentIsLibrary) {
+    if (loginComponentIsLibrary.toBoolean()) {
         implementation project(':LoginComponent')
     }
 
     // 账户组件
-    if (accountComponentIsLibrary) {
+    if (accountComponentIsLibrary.toBoolean()) {
         implementation project(':AccountComponent')
     }
 
