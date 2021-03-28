@@ -1,8 +1,8 @@
 package cn.xiaoxige.serviceassistant.api
 
 import cn.xiaoxige.appapi.IAppAbilityApi
-//import cn.xiaoxige.serviceassistantcore.IService
-//import cn.xiaoxige.serviceassistantcore.annotation.Service
+import cn.xiaoxige.serviceassistantcore.IService
+import cn.xiaoxige.serviceassistantcore.annotation.Service
 
 /**
  * @author xiaoxige
@@ -11,13 +11,13 @@ import cn.xiaoxige.appapi.IAppAbilityApi
  * email: xiaoxigexiaoan@outlook.com
  * desc:
  */
-//@Service
-//class AppAbilityApiImpl : IService<IAppAbilityApi>, IAppAbilityApi {
-//    /**
-//     * 使用方提供
-//     */
-//    override fun getService(): IAppAbilityApi {
-//        return AppAbilityApiImpl()
-//    }
-//
-//}
+@Service
+class AppAbilityApiImpl : IService<IAppAbilityApi>, IAppAbilityApi {
+    /**
+     * 使用方提供
+     */
+    override fun getService(): IAppAbilityApi {
+        return AppAbilityApiImpl()
+    }
+
+}

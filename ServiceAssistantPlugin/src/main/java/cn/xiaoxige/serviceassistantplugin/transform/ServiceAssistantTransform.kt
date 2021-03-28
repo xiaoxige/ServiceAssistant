@@ -89,14 +89,13 @@ class ServiceAssistantTransform : Transform() {
 
         val dirFile = dirInput.file ?: return
         if (dirFile.isDirectory) {
-            dirFile.listFiles()?.forEach { file ->
-                println("dir -> ${file.name}")
+            depthTraversalDir(dirFile) {
+                println("dir -> ${it.name}")
             }
         }
 
         val outFile = outputProvider.getContentLocation(
-            dirInput.name, dirInput.contentTypes, dirInput.scopes,
-            Format.DIRECTORY
+            dirInput.name, dirInput.contentTypes, dirInput.scopes, Format.DIRECTORY
         )
         FileUtils.copyDirectory(dirInput.file, outFile)
     }
@@ -108,6 +107,7 @@ class ServiceAssistantTransform : Transform() {
         if (jarInput == null) return
         val file = jarInput.file ?: return
         if (!file.absolutePath.endsWith(".jar")) return
+
         val name = DigestUtils.md5Hex(file.absolutePath)
         val tempFileName = "$name-temp"
         val tempFile = File("${file.parent}${File.separator}${tempFileName}")
@@ -121,10 +121,7 @@ class ServiceAssistantTransform : Transform() {
                 val jarName = jarEntity.name
                 val zipEntity = ZipEntry(jarName)
                 val inputStream = jarFile.getInputStream(zipEntity)
-                if (jarName.endsWith(".class") && !jarName.startsWith("androidx/")
-                    && !jarName.contains("R$")
-                    && !jarName.contains("R.")
-                ) {
+                if (jarName.endsWith(".class")) {
                     println("jar -> $jarName")
                 }
                 jos.putNextEntry(zipEntity)
@@ -137,11 +134,20 @@ class ServiceAssistantTransform : Transform() {
 
         jarFile.close()
         val dest = outputProvider.getContentLocation(
-            name,
-            jarInput.contentTypes, jarInput.scopes, Format.JAR
+            name, jarInput.contentTypes, jarInput.scopes, Format.JAR
         )
         FileUtils.copyFile(tempFile, dest)
         tempFile.delete()
+    }
+
+    private fun depthTraversalDir(file: File, back: (File) -> Unit) {
+        if (file.isFile) {
+            back.invoke(file)
+            return
+        }
+        file.listFiles()?.forEach {
+            depthTraversalDir(it, back)
+        }
     }
 
 }
