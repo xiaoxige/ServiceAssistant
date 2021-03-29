@@ -21,13 +21,10 @@ class PluginLaunch : Plugin<Project> {
             throw RuntimeException("service assistant plugin only use in application.")
         }
 
-        println("service assistant plugin run.")
+        println("service assistant plugin install. -> ${project.name}")
 
         val appExtension = project.extensions.getByType(AppExtension::class.java)
         appExtension.registerTransform(ServiceAssistantTransform())
-
-        println("service assistant plugin end.")
-
     }
 
 }

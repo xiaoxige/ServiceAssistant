@@ -1,5 +1,6 @@
 package cn.xiaoxige.serviceassistantplugin.transform
 
+import cn.xiaoxige.serviceassistantplugin.core.ServiceAssistantClassVisitor
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.android.utils.FileUtils
@@ -91,6 +92,18 @@ class ServiceAssistantTransform : Transform() {
         if (dirFile.isDirectory) {
             depthTraversalDir(dirFile) {
                 println("dir -> ${it.name}")
+                val name = it.name
+                if (!name.endsWith(".class")
+                    || name.startsWith("R\$")
+                    || name == "R.class"
+                    || name == "BuildConfig.class"
+                ) {
+                    return@depthTraversalDir
+                }
+                val byte = ServiceAssistantClassVisitor(it.readBytes()).visitor()
+                FileOutputStream("${it.parentFile.absolutePath}${File.separator}${it.name}").use { fos ->
+                    fos.write(byte)
+                }
             }
         }
 
@@ -121,12 +134,19 @@ class ServiceAssistantTransform : Transform() {
                 val jarName = jarEntity.name
                 val zipEntity = ZipEntry(jarName)
                 val inputStream = jarFile.getInputStream(zipEntity)
-                if (jarName.endsWith(".class")) {
-                    println("jar -> $jarName")
-                }
                 jos.putNextEntry(zipEntity)
                 inputStream.use {
-                    jos.write(IOUtils.toByteArray(it))
+                    val byte = if (jarName.endsWith(".class")
+                        && !name.startsWith("R\$")
+                        && name != "R.class"
+                        && name != "BuildConfig.class"
+                    ) {
+                        println("jar -> $jarName")
+                        ServiceAssistantClassVisitor(IOUtils.toByteArray(it)).visitor()
+                    } else {
+                        IOUtils.toByteArray(it)
+                    }
+                    jos.write(byte)
                 }
                 jos.closeEntry()
             }
