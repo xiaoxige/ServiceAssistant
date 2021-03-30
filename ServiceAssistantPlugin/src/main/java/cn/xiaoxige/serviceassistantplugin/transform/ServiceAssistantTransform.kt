@@ -91,7 +91,6 @@ class ServiceAssistantTransform : Transform() {
         val dirFile = dirInput.file ?: return
         if (dirFile.isDirectory) {
             depthTraversalDir(dirFile) {
-                println("dir -> ${it.name}")
                 val name = it.name
                 if (!name.endsWith(".class")
                     || name.startsWith("R\$")
@@ -100,8 +99,9 @@ class ServiceAssistantTransform : Transform() {
                 ) {
                     return@depthTraversalDir
                 }
+                println("dir -> $name")
                 val byte = ServiceAssistantClassVisitor(it.readBytes()).visitor()
-                FileOutputStream("${it.parentFile.absolutePath}${File.separator}${it.name}").use { fos ->
+                FileOutputStream(it).use { fos ->
                     fos.write(byte)
                 }
             }
