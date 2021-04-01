@@ -88,7 +88,13 @@ class ServiceAssistantTransform : Transform() {
     ) {
         if (dirInput == null) return
 
+        // 输入文件
         val dirFile = dirInput.file ?: return
+        // 输出文件
+        val outFile = outputProvider.getContentLocation(
+            dirInput.name, dirInput.contentTypes, dirInput.scopes, Format.DIRECTORY
+        )
+
         if (dirFile.isDirectory) {
             depthTraversalDir(dirFile) {
                 val name = it.name
@@ -99,7 +105,7 @@ class ServiceAssistantTransform : Transform() {
                 ) {
                     return@depthTraversalDir
                 }
-                println("dir -> $name")
+//                println("dir -> $name")
                 val byte = ServiceAssistantClassVisitor(it.readBytes()).visitor()
                 FileOutputStream(it).use { fos ->
                     fos.write(byte)
@@ -107,9 +113,6 @@ class ServiceAssistantTransform : Transform() {
             }
         }
 
-        val outFile = outputProvider.getContentLocation(
-            dirInput.name, dirInput.contentTypes, dirInput.scopes, Format.DIRECTORY
-        )
         FileUtils.copyDirectory(dirInput.file, outFile)
     }
 
@@ -120,8 +123,12 @@ class ServiceAssistantTransform : Transform() {
         if (jarInput == null) return
         val file = jarInput.file ?: return
         if (!file.absolutePath.endsWith(".jar")) return
-
         val name = DigestUtils.md5Hex(file.absolutePath)
+        // 输出文件
+        val dest = outputProvider.getContentLocation(
+            name, jarInput.contentTypes, jarInput.scopes, Format.JAR
+        )
+
         val tempFileName = "$name-temp"
         val tempFile = File("${file.parent}${File.separator}${tempFileName}")
 
@@ -141,7 +148,7 @@ class ServiceAssistantTransform : Transform() {
                         && name != "R.class"
                         && name != "BuildConfig.class"
                     ) {
-                        println("jar -> $jarName")
+//                        println("jar -> $jarName")
                         ServiceAssistantClassVisitor(IOUtils.toByteArray(it)).visitor()
                     } else {
                         IOUtils.toByteArray(it)
@@ -153,9 +160,7 @@ class ServiceAssistantTransform : Transform() {
         }
 
         jarFile.close()
-        val dest = outputProvider.getContentLocation(
-            name, jarInput.contentTypes, jarInput.scopes, Format.JAR
-        )
+
         FileUtils.copyFile(tempFile, dest)
         tempFile.delete()
     }

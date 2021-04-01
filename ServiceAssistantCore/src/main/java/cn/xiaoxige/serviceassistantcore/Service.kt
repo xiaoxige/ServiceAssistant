@@ -9,20 +9,29 @@ package cn.xiaoxige.serviceassistantcore
  */
 object Service {
 
+    private val mServiceRelation = mutableMapOf<String, Any?>()
+
     init {
         autoRegisterFromAnnotation()
     }
 
     private fun autoRegisterFromAnnotation() {
-        // auto write when building
+        // auto write when building, like this
+        // registerService(key, instance)
     }
 
-    inline fun <reified T> registerService(service: IService<T>) {
-        val key = T::class.java.name
-
+    private fun registerService(key: String, service: IService<*>) {
+        mServiceRelation.remove(key)
+        mServiceRelation[key] = service.getService()
     }
 
     fun <T> getService(clazz: Class<T>): T? {
-        TODO()
+        println(clazz.name)
+        return try {
+            @Suppress("UNCHECKED_CAST")
+            mServiceRelation[clazz.name] as T?
+        } catch (ex: Exception) {
+            null
+        }
     }
 }
