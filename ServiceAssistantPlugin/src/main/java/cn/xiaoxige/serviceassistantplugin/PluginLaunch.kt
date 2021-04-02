@@ -1,6 +1,7 @@
 package cn.xiaoxige.serviceassistantplugin
 
 import cn.xiaoxige.serviceassistantplugin.transform.ServiceAssistantTransform
+import cn.xiaoxige.serviceassistantplugin.util.Logger
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.AppPlugin
 import org.gradle.api.Plugin
@@ -21,7 +22,10 @@ class PluginLaunch : Plugin<Project> {
             throw RuntimeException("service assistant plugin only use in application.")
         }
 
-        println("service assistant plugin install. -> ${project.name}")
+        // 初始化日志工具
+        Logger.make(project)
+
+        Logger.i("service assistant plugin install. -> ${project.name}")
 
         val appExtension = project.extensions.getByType(AppExtension::class.java)
         appExtension.registerTransform(ServiceAssistantTransform())

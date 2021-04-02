@@ -38,6 +38,9 @@ dependencies {
     // 服务助手
     implementation project(':ServiceAssistantCore')
     implementation project(':AppApi')
+    implementation project(':LoginApi')
+    implementation project(':AccountApi')
+
 
     // 登录组件
     if (loginComponentIsLibrary.toBoolean()) {

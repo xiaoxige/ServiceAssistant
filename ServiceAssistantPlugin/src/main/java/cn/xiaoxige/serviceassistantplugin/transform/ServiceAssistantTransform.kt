@@ -1,6 +1,9 @@
 package cn.xiaoxige.serviceassistantplugin.transform
 
+import cn.xiaoxige.serviceassistantplugin.constant.ServiceAssistantConstant
 import cn.xiaoxige.serviceassistantplugin.core.ServiceAssistantClassVisitor
+import cn.xiaoxige.serviceassistantplugin.core.ServiceClassVisitor
+import cn.xiaoxige.serviceassistantplugin.util.Logger
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.android.utils.FileUtils
@@ -20,6 +23,10 @@ import java.util.zip.ZipEntry
  * desc: transform
  */
 class ServiceAssistantTransform : Transform() {
+
+    private val mNeedScanClassInfo = mutableListOf<Pair<String, String>>()
+    private var mServiceFile: File? = null
+
     /**
      * Returns the unique name of the transform.
      *
@@ -61,7 +68,9 @@ class ServiceAssistantTransform : Transform() {
 
     override fun transform(transformInvocation: TransformInvocation?) {
         super.transform(transformInvocation)
-        println("transform start.")
+        val startTime = System.currentTimeMillis()
+        Logger.i("Service Assistant start run")
+
         val inputs = transformInvocation?.inputs ?: return
         val outputProvider = transformInvocation.outputProvider
 
@@ -79,7 +88,19 @@ class ServiceAssistantTransform : Transform() {
             }
         }
 
-        println("transform end.")
+        Logger.i("scan info: ")
+        mNeedScanClassInfo.forEach {
+            Logger.i("${it.first} -> ${it.second}")
+        }
+
+        if (mServiceFile == null || !mServiceFile!!.name.endsWith(".jar")) {
+            Logger.w("can not find Service, Is this what you want？ or dependence cn.xiaoxige.serviceassistantplugin:core:xxx")
+        } else {
+            // insert code
+            handleServiceInsertCode(mServiceFile!!)
+        }
+
+        Logger.i("Service Assistant finish, current cost time: ${System.currentTimeMillis() - startTime} ms")
     }
 
     private fun handleDirInput(
@@ -105,8 +126,10 @@ class ServiceAssistantTransform : Transform() {
                 ) {
                     return@depthTraversalDir
                 }
-//                println("dir -> $name")
-                val byte = ServiceAssistantClassVisitor(it.readBytes()).visitor()
+                val byte = ServiceAssistantClassVisitor(it.readBytes(), {
+                }) { targetInterface, targetClass ->
+                    mNeedScanClassInfo.add(Pair(targetInterface, targetClass))
+                }.visitor()
                 FileOutputStream(it).use { fos ->
                     fos.write(byte)
                 }
@@ -123,10 +146,15 @@ class ServiceAssistantTransform : Transform() {
         if (jarInput == null) return
         val file = jarInput.file ?: return
         if (!file.absolutePath.endsWith(".jar")) return
-        val name = DigestUtils.md5Hex(file.absolutePath)
+        var name = jarInput.name
+        if (name.endsWith(".jar")) {
+            name = name.substring(0, name.length - 4)
+        }
+        val md5Name = DigestUtils.md5Hex(file.absolutePath)
+
         // 输出文件
         val dest = outputProvider.getContentLocation(
-            name, jarInput.contentTypes, jarInput.scopes, Format.JAR
+            "$md5Name$name", jarInput.contentTypes, jarInput.scopes, Format.JAR
         )
 
         val tempFileName = "$name-temp"
@@ -144,12 +172,15 @@ class ServiceAssistantTransform : Transform() {
                 jos.putNextEntry(zipEntity)
                 inputStream.use {
                     val byte = if (jarName.endsWith(".class")
-                        && !name.startsWith("R\$")
-                        && name != "R.class"
-                        && name != "BuildConfig.class"
+                        && !jarName.startsWith("R\$")
+                        && jarName != "R.class"
+                        && jarName != "BuildConfig.class"
                     ) {
-//                        println("jar -> $jarName")
-                        ServiceAssistantClassVisitor(IOUtils.toByteArray(it)).visitor()
+                        ServiceAssistantClassVisitor(IOUtils.toByteArray(it), {
+                            mServiceFile = dest
+                        }) { targetInterface, targetClass ->
+                            mNeedScanClassInfo.add(Pair(targetInterface, targetClass))
+                        }.visitor()
                     } else {
                         IOUtils.toByteArray(it)
                     }
@@ -165,6 +196,37 @@ class ServiceAssistantTransform : Transform() {
         tempFile.delete()
     }
 
+    private fun handleServiceInsertCode(serviceFile: File) {
+        val tempFile = File(serviceFile.parent, "${serviceFile.name}.temp")
+        if (tempFile.exists()) tempFile.delete()
+
+        val jarFile = JarFile(serviceFile)
+        val entries = jarFile.entries()
+        val outputStream = JarOutputStream(FileOutputStream(tempFile))
+        outputStream.use { jos ->
+            while (entries.hasMoreElements()) {
+                val jarEntity = entries.nextElement()
+                val jarName = jarEntity.name
+                val zipEntity = ZipEntry(jarName)
+                val inputStream = jarFile.getInputStream(zipEntity)
+                jos.putNextEntry(zipEntity)
+                inputStream.use {
+                    val byte = if (jarName == ServiceAssistantConstant.PATH_SERVICE_CLASS) {
+                        ServiceClassVisitor(IOUtils.toByteArray(it), mNeedScanClassInfo).visitor()
+                    } else {
+                        IOUtils.toByteArray(it)
+                    }
+                    jos.write(byte)
+                }
+                jos.closeEntry()
+            }
+        }
+        jarFile.close()
+
+        mServiceFile?.delete()
+        FileUtils.renameTo(tempFile, mServiceFile)
+    }
+
     private fun depthTraversalDir(file: File, back: (File) -> Unit) {
         if (file.isFile) {
             back.invoke(file)
@@ -174,5 +236,4 @@ class ServiceAssistantTransform : Transform() {
             depthTraversalDir(it, back)
         }
     }
-
 }
