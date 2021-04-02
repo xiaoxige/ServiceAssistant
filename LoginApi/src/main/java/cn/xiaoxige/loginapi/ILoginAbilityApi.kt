@@ -15,4 +15,12 @@ interface ILoginAbilityApi {
      * 登录
      */
     fun toLogin(context: Context)
+
+    fun addLoginStateChangedListener(listener: ILoginStateChangedListener)
+
+    fun removeLoginStateChangeListener(listener: ILoginStateChangedListener)
+
+    interface ILoginStateChangedListener {
+        fun change(state: Boolean)
+    }
 }

@@ -11,6 +11,5 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.account_activity_main)
 
-        requestLoginAbilityApi()?.toLogin(this)
     }
 }

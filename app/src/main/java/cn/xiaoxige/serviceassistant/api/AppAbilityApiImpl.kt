@@ -1,6 +1,8 @@
 package cn.xiaoxige.serviceassistant.api
 
+import android.content.Context
 import cn.xiaoxige.appapi.IAppAbilityApi
+import cn.xiaoxige.serviceassistant.AboutActivity
 import cn.xiaoxige.serviceassistantcore.IService
 import cn.xiaoxige.serviceassistantcore.annotation.Service
 
@@ -18,6 +20,10 @@ class AppAbilityApiImpl : IService<IAppAbilityApi>, IAppAbilityApi {
      */
     override fun getService(): IAppAbilityApi {
         return AppAbilityApiImpl()
+    }
+
+    override fun toAbout(context: Context) {
+        AboutActivity.showActivity(context)
     }
 
 }

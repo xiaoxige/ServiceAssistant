@@ -56,6 +56,8 @@ dependencies {
     implementation project(':ServiceAssistantCore')
     implementation project(':AccountApi')
     implementation project(':LoginApi')
+    implementation project(':AppApi')
+
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.2.0'

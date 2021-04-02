@@ -16,6 +16,7 @@ import cn.xiaoxige.serviceassistantcore.annotation.Service
 @Service
 class LoginAbilityApiImpl : IService<ILoginAbilityApi>, ILoginAbilityApi {
 
+
     /**
      * 使用方提供
      */
@@ -28,6 +29,25 @@ class LoginAbilityApiImpl : IService<ILoginAbilityApi>, ILoginAbilityApi {
      */
     override fun toLogin(context: Context) {
         LoginActivity.showActivity(context)
+    }
+
+    override fun addLoginStateChangedListener(listener: ILoginAbilityApi.ILoginStateChangedListener) {
+        sLoginStateChangedListener.add(listener)
+    }
+
+    override fun removeLoginStateChangeListener(listener: ILoginAbilityApi.ILoginStateChangedListener) {
+        sLoginStateChangedListener.remove(listener)
+    }
+
+    companion object {
+        private val sLoginStateChangedListener =
+            mutableListOf<ILoginAbilityApi.ILoginStateChangedListener>()
+
+        fun notifyLoginState(state: Boolean) {
+            sLoginStateChangedListener.forEach {
+                it.change(state)
+            }
+        }
     }
 
 }
