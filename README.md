@@ -44,7 +44,7 @@ apply plugin: 'service-assistant'
 
 # 加入核心依赖
 dependencies {
-	implementation 'cn.xiaoxige.serviceassistantplugin:core:1.0.0'
+	implementation 'cn.xiaoxige.serviceassistant:core:1.0.0'
 }
 ```
 

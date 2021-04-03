@@ -13,7 +13,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
 
-group = 'cn.xiaoxige.serviceassistantplugin'
+group = 'cn.xiaoxige.serviceassistant'
 archivesBaseName = 'core'
 version = '1.0.0'
 
