@@ -1,4 +1,6 @@
 # ServiceAssistant（服务助手）
+## github 地址
+[ServiceAssistant](https://github.com/xiaoxige/ServiceAssistant)
 ## 介绍
 **为组件化而生， 可以轻松灵活实现组件之间的任何通信及交互。**
 
@@ -13,7 +15,7 @@
 ## 依赖
 在项目 gradle 中配置
 
-``` groovy 
+```groovy 
 repositories {
     maven {
             url "https://gitee.com/xiaoxigexiaoan/warehouse/raw/master"
@@ -36,7 +38,7 @@ allprojects {
 
 在 APP gradle 中配置
 
-``` groovy
+```groovy
 # 引入插件
 apply plugin: 'service-assistant'
 
@@ -51,7 +53,7 @@ dependencies {
 ## 核心思想
 A 和 B 两个互不依赖的库（也包含 A 依赖 B, B 需要访问 A 的操作）。比如 B 需要访问 A, 那么必须知晓 A 提供出来了什么能力。 所以 A 需要抛出一系列接口能力（当然这些抛出的能力肯定是谁抛出谁去实现, 这里肯定是 A 实现）, B 去依赖 A 的接口， 就可以轻松访问 A 的能力。 那么 B 依赖 A 的接口， 怎么就调用到 A 的实现了呢？ 这就是该库所要做的事情！
 
-![通讯模型](https://raw.githubusercontent.com/xiaoxige/ServiceAssistant/master/img/communication_model.png)
+![通讯模型](https://img-blog.csdnimg.cn/img_convert/b18849bf2a1e5b7fdf8e12a2f5200974.png)
 
 ## 类介绍（一共就 3 个类）
 | name | desc|
@@ -67,7 +69,7 @@ A 和 B 两个互不依赖的库（也包含 A 依赖 B, B 需要访问 A 的操
 比如账户组件需要登录组件的登录及用户信息
 登录组件提供的 Api 接口能力中(详情可见 Demo 中的 LoginApi): 
 
-``` kotlin
+```kotlin
 interface IUserInfoApi {
 
     /**
@@ -100,7 +102,7 @@ interface ILoginAbilityApi {
 
 登录组件中相关能力实现(详情可见 LoginComponent)
 
-``` kotlin
+```kotlin
 @Service
 class UserInfoApiImpl : IService<IUserInfoApi>, IUserInfoApi {
     /**
@@ -165,7 +167,7 @@ class LoginAbilityApiImpl : IService<ILoginAbilityApi>, ILoginAbilityApi {
 
 账户组件获取登录信息 （详情可见 AccountComponent）
 
-``` kotlin
+```kotlin
 Service.getService(IUserInfoApi::class.java)?.let {
     tvUserInfo.text = if (it.isLogin()) "userId: ${it.getUserId()}" else "未登录"
 }
