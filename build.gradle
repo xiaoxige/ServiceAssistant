@@ -5,7 +5,7 @@ buildscript {
 
     repositories {
         maven {
-            url uri('./plugin')
+            url "https://gitee.com/xiaoxigexiaoan/warehouse/raw/master"
         }
         google()
         jcenter()
@@ -24,7 +24,7 @@ buildscript {
 allprojects {
     repositories {
         maven {
-            url uri('./plugin')
+            url "https://gitee.com/xiaoxigexiaoan/warehouse/raw/master"
         }
         google()
         jcenter()
