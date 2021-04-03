@@ -50,7 +50,8 @@ dependencies {
 
 ## 核心思想
 A 和 B 两个互不依赖的库（也包含 A 依赖 B, B 需要访问 A 的操作）。比如 B 需要访问 A, 那么必须知晓 A 提供出来了什么能力。 所以 A 需要抛出一系列接口能力（当然这些抛出的能力肯定是谁抛出谁去实现, 这里肯定是 A 实现）, B 去依赖 A 的接口， 就可以轻松访问 A 的能力。 那么 B 依赖 A 的接口， 怎么就调用到 A 的实现了呢？ 这就是该库所要做的事情！
-![通讯模型]()
+
+![通讯模型](https://github.com/xiaoxige/ServiceAssistant/blob/master/img/communication_model.png)
 
 ## 类介绍（一共就 3 个类）
 | name | desc|
@@ -176,3 +177,4 @@ Service.getService(IUserInfoApi::class.java)?.let {
 **关于组件的初始化、 组件之间跳转、 组件之间的通讯、 组件之间的回调等用法效果请运行 Demo 查看效果， 其用法请参考 Demo!!!**
 
 
+**如果觉得有帮助， 欢迎 Star**
