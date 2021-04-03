@@ -1,6 +1,7 @@
 package cn.xiaoxige.accountapi
 
 import android.content.Context
+import androidx.fragment.app.Fragment
 
 /**
  * @author xiaoxige
@@ -12,4 +13,6 @@ import android.content.Context
 interface IAccountAbilityApi {
 
     fun toAccount(context: Context)
+
+    fun getAccountFragment(): Fragment
 }

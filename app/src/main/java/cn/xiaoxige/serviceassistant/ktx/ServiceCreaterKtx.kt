@@ -1,6 +1,7 @@
 package cn.xiaoxige.serviceassistant.ktx
 
 import android.widget.Toast
+import cn.xiaoxige.accountapi.IAccountAbilityApi
 import cn.xiaoxige.loginapi.ILoginAbilityApi
 import cn.xiaoxige.serviceassistant.AppApplication
 import cn.xiaoxige.serviceassistantcore.Service
@@ -21,4 +22,14 @@ fun requestLoginAbilityApi(): ILoginAbilityApi? {
     }
 
     return loginAbilityApi
+}
+
+fun requestAccountAbilityApi(): IAccountAbilityApi? {
+    val accountAbilityApi = Service.getService(IAccountAbilityApi::class.java)
+    if (accountAbilityApi == null) {
+        Toast.makeText(AppApplication.sApplication, "未发现账户组件", Toast.LENGTH_SHORT).show()
+        return null
+    }
+
+    return accountAbilityApi
 }

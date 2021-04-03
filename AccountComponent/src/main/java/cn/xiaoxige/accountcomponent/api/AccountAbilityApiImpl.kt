@@ -1,8 +1,10 @@
 package cn.xiaoxige.accountcomponent.api
 
 import android.content.Context
+import androidx.fragment.app.Fragment
 import cn.xiaoxige.accountapi.IAccountAbilityApi
 import cn.xiaoxige.accountcomponent.AccountActivity
+import cn.xiaoxige.accountcomponent.AccountFragment
 import cn.xiaoxige.serviceassistantcore.IService
 import cn.xiaoxige.serviceassistantcore.annotation.Service
 
@@ -24,6 +26,10 @@ class AccountAbilityApiImpl : IService<IAccountAbilityApi>, IAccountAbilityApi {
 
     override fun toAccount(context: Context) {
         AccountActivity.showActivity(context)
+    }
+
+    override fun getAccountFragment(): Fragment {
+        return AccountFragment()
     }
 
 }

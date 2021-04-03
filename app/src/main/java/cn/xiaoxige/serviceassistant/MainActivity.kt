@@ -8,6 +8,7 @@ import android.widget.Toast
 import cn.xiaoxige.accountapi.IAccountAbilityApi
 import cn.xiaoxige.loginapi.ILoginAbilityApi
 import cn.xiaoxige.loginapi.IUserInfoApi
+import cn.xiaoxige.serviceassistant.ktx.requestAccountAbilityApi
 import cn.xiaoxige.serviceassistant.ktx.requestLoginAbilityApi
 import cn.xiaoxige.serviceassistantcore.Service
 
@@ -29,6 +30,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         registerListener()
+
+        // 列如 fragment 一般做法， 这里点到为止
+        val accountFragment =
+            requestAccountAbilityApi()?.getAccountFragment() ?: DefaultAccountFragment()
+        // 添加 accountFragment
     }
 
     private fun registerListener() {
