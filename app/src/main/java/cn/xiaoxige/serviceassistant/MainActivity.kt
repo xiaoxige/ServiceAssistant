@@ -10,6 +10,8 @@ import cn.xiaoxige.loginapi.ILoginAbilityApi
 import cn.xiaoxige.loginapi.IUserInfoApi
 import cn.xiaoxige.serviceassistant.ktx.requestAccountAbilityApi
 import cn.xiaoxige.serviceassistant.ktx.requestLoginAbilityApi
+import cn.xiaoxige.serviceassistant.repo.IAboutRepo
+import cn.xiaoxige.serviceassistantannotation.Injected
 import cn.xiaoxige.serviceassistantcore.Service
 
 class MainActivity : AppCompatActivity() {
@@ -17,6 +19,9 @@ class MainActivity : AppCompatActivity() {
     private val tvDesc by lazy {
         findViewById<TextView>(R.id.tvDesc)
     }
+
+    @Injected
+    private lateinit var mAboutRepo: IAboutRepo
 
     private val mLoginStateListener = LoginStateChangeBack()
 

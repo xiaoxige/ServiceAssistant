@@ -44,6 +44,19 @@ class ServiceAssistantClassVisitor(
         }
     }
 
+    override fun visitField(
+        access: Int,
+        name: String?,
+        descriptor: String?,
+        signature: String?,
+        value: Any?
+    ): FieldVisitor {
+//        if (mVisitorClassName.indexOf("MainActivity") >= 0) {
+//            println("name: $name, desc: $descriptor, sign: $signature, value: ${value?.toString()}")
+//        }
+        return super.visitField(access, name, descriptor, signature, value)
+    }
+
     override fun visitAnnotation(descriptor: String?, visible: Boolean): AnnotationVisitor {
         descriptor?.let {
 

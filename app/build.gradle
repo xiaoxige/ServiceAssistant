@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'service-assistant'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -36,11 +37,13 @@ android {
 dependencies {
 
     // 服务助手
-    implementation 'cn.xiaoxige.serviceassistant:core:1.0.0'
+//    implementation 'cn.xiaoxige.serviceassistant:core:1.0.0'
+    implementation project(':ServiceAssistantCore')
     implementation project(':AppApi')
     implementation project(':LoginApi')
     implementation project(':AccountApi')
 
+    kapt project(':ServiceAssistantProcessor')
 
     // 登录组件
     if (loginComponentIsLibrary.toBoolean()) {

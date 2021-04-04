@@ -11,11 +11,12 @@ java {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    api project(':ServiceAssistantAnnotation')
 }
 
 group = 'cn.xiaoxige.serviceassistant'
 archivesBaseName = 'core'
-version = '1.0.0'
+version = '1.0.1'
 
 uploadArchives {
     repositories {

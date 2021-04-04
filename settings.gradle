@@ -1,3 +1,5 @@
+include ':ServiceAssistantProcessor'
+include ':ServiceAssistantAnnotation'
 include ':AppApi'
 include ':AccountComponent'
 include ':AccountApi'
