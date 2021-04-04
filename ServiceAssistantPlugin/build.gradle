@@ -18,8 +18,8 @@ dependencies {
     implementation 'com.android.tools.build:gradle:4.1.2'
 }
 
-group = 'cn.xiaoxige.serviceassistantplugin'
-archivesBaseName = 'service-assistant-plugin'
+group = 'cn.xiaoxige.serviceassistant'
+archivesBaseName = 'plugin'
 version = '1.0.1'
 
 uploadArchives {

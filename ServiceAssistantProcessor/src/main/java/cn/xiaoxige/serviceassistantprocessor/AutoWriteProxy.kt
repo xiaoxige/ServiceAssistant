@@ -12,7 +12,6 @@ import javax.lang.model.element.Modifier
  * desc: 自动写入的代码
  * 考虑到使用方可能会使用 java , 为了方便直接使用 javapoet 而非 kotlinpoet
  */
-
 class AutoWriteProxy(
     private val needInjectedInfo: Map<String, Pair<String, Boolean>>,
     private val injectedInfo: Map<String, Boolean>,
@@ -20,12 +19,21 @@ class AutoWriteProxy(
 ) {
     fun write() {
 
+        // 注解
+        val annotation =
+            AnnotationSpec.builder(ClassName.get("androidx.annotation", "Keep")).build()
+        // 构造方法
+        val constructorMethod = createConstructorMethod()
+        // 属性
         val field = createField()
+        // 方法
         val methods = createMethodProducer()
 
         val autoClass = TypeSpec.classBuilder(NAME_AUTO_WRITE_CLASS)
             .addJavadoc("This class is a Service Assistant Processor transfer center class.\n which is automatically generated. Please do not make any changes.\n")
+            .addAnnotation(annotation)
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+            .addMethod(constructorMethod)
             .addField(field)
             .addMethods(methods)
             .build()
@@ -46,9 +54,30 @@ class AutoWriteProxy(
             .build()
     }
 
+    private fun createConstructorMethod(): MethodSpec {
+        val methodSpecBuilder = MethodSpec.constructorBuilder()
+            .addModifiers(Modifier.PUBLIC)
+            .addJavadoc("It mainly initializes the injection implementation of single instance.\n")
+
+        needInjectedInfo.keys.forEach {
+            val value = needInjectedInfo[it] ?: return@forEach
+            // 如果是单例的话, 直接加入 sMap 中
+            if (value.second) {
+                val full = value.first
+                methodSpecBuilder.addStatement(
+                    """sMap.put("$it", new ${'$'}T())""",
+                    ClassName.get(getPackage(full), getClassName(full))
+                )
+            }
+        }
+
+        return methodSpecBuilder.build()
+    }
+
     private fun createMethodProducer(): List<MethodSpec> {
         val methods = mutableListOf<MethodSpec>()
 
+        // 自动生成注入获取实现的方法
         needInjectedInfo.keys.forEach {
             val needInjected = needInjectedInfo[it] ?: return@forEach
             methods.add(
@@ -59,6 +88,16 @@ class AutoWriteProxy(
                     needInjected.second
                 )
             )
+        }
+
+        // 防止手动注册了没有实现的注入内容
+        injectedInfo.filter {
+            needInjectedInfo[it.key] == null
+        }.forEach { entity ->
+            if (entity.value) {
+                throw RuntimeException("No corresponding injection implementation was found --> ${entity.key}")
+            }
+            createMethod(getAutoMethodName(entity.key), entity.key, "", true)
         }
 
         return methods
@@ -80,7 +119,13 @@ class AutoWriteProxy(
                 )
             )
 
-        if (isSingleCase) {
+        if (needInjectedFullClass.isEmpty()) {
+            return methodSpecBuilder
+                .addStatement("return null")
+                .build()
+        }
+
+        return if (isSingleCase) {
             methodSpecBuilder.addStatement("""return ($needInjectedInterface)sMap.get("$needInjectedInterface")""")
         } else {
             methodSpecBuilder.addStatement(
@@ -90,8 +135,7 @@ class AutoWriteProxy(
                     getClassName(needInjectedFullClass)
                 )
             )
-        }
-        return methodSpecBuilder.build()
+        }.build()
     }
 
     private fun getAutoMethodName(path: String): String {

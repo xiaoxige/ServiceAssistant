@@ -1,6 +1,7 @@
 plugins {
     id 'java-library'
     id 'kotlin'
+    id 'maven'
 }
 
 java {
@@ -10,4 +11,16 @@ java {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+}
+
+group = 'cn.xiaoxige.serviceassistant'
+archivesBaseName = 'annotation'
+version = '1.0.0'
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri('../plugin'))
+        }
+    }
 }
