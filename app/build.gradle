@@ -44,7 +44,7 @@ dependencies {
     implementation project(':AccountApi')
 
 //    kapt project(':ServiceAssistantProcessor')
-    kapt 'cn.xiaoxige.serviceassistant:processor:1.0.1'
+    kapt 'cn.xiaoxige.serviceassistant:processor:1.0.2'
 
     // 登录组件
     if (loginComponentIsLibrary.toBoolean()) {

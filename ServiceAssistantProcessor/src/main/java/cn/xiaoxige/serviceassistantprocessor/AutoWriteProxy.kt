@@ -22,10 +22,9 @@ class AutoWriteProxy(
         // 注解
         val annotation =
             AnnotationSpec.builder(ClassName.get("androidx.annotation", "Keep")).build()
-        // 构造方法
-        val constructorMethod = createInitMethod()
         // 属性
         val field = createField()
+        val lockField = createLockField()
         // 方法
         val methods = createMethodProducer()
 
@@ -33,10 +32,9 @@ class AutoWriteProxy(
             .addJavadoc("This class is a Service Assistant Processor transfer center class.\n which is automatically generated. Please do not make any changes.\n")
             .addAnnotation(annotation)
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-            .addMethod(constructorMethod)
             .addField(field)
+            .addField(lockField)
             .addMethods(methods)
-            .addStaticBlock(CodeBlock.of("init();\n"))
             .build()
 
         JavaFile.builder(NAME_PACKAGE_AUTO_WRITE_CLASS, autoClass)
@@ -49,30 +47,23 @@ class AutoWriteProxy(
             ClassName.get(String::class.java),
             ClassName.get(Any::class.java)
         )
-        return FieldSpec.builder(mapType, "sMap", Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+        return FieldSpec.builder(mapType, "sMap", Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
             .addJavadoc("The injected object of singleton automatically exists here.\n")
             .initializer("""new ${'$'}T()""", LinkedHashMap::class.java)
             .build()
     }
 
-    private fun createInitMethod(): MethodSpec {
-        val methodSpecBuilder = MethodSpec.methodBuilder("init")
-            .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
-            .addJavadoc("It mainly initializes the injection implementation of single instance.\n")
-
-        needInjectedInfo.keys.forEach {
-            val value = needInjectedInfo[it] ?: return@forEach
-            // 如果是单例的话, 直接加入 sMap 中
-            if (value.second) {
-                val full = value.first
-                methodSpecBuilder.addStatement(
-                    """sMap.put("$it", new ${'$'}T())""",
-                    ClassName.get(getPackage(full), getClassName(full))
-                )
-            }
-        }
-
-        return methodSpecBuilder.build()
+    private fun createLockField(): FieldSpec {
+        return FieldSpec.builder(
+            Any::class.java,
+            "sLock",
+            Modifier.PRIVATE,
+            Modifier.FINAL,
+            Modifier.STATIC
+        )
+            .addJavadoc("Changed mainly for lock guarantee instance\n")
+            .initializer("""new ${'$'}T()""", Any::class.java)
+            .build()
     }
 
     private fun createMethodProducer(): List<MethodSpec> {
@@ -127,7 +118,32 @@ class AutoWriteProxy(
         }
 
         return if (isSingleCase) {
-            methodSpecBuilder.addStatement("""return ($needInjectedInterface)sMap.get("$needInjectedInterface")""")
+            methodSpecBuilder.addStatement("""Object result = sMap.get("$needInjectedInterface")""")
+            methodSpecBuilder.beginControlFlow("if(result != null)")
+            methodSpecBuilder.addStatement("""return ($needInjectedInterface)result""")
+            methodSpecBuilder.endControlFlow()
+            // 如果没有找到（即还没有初始化), 进行初始化并记录
+            methodSpecBuilder.beginControlFlow("synchronized(sLock)")
+
+            // 再次获取, 如果没有进行初始化
+            methodSpecBuilder.addStatement("""result = sMap.get("$needInjectedInterface")""")
+            methodSpecBuilder.beginControlFlow("if(result != null)")
+            methodSpecBuilder.addStatement("""return ($needInjectedInterface)result""")
+            methodSpecBuilder.endControlFlow()
+
+            methodSpecBuilder.addStatement(
+                """Object instance = new ${'$'}T()""", ClassName.get(
+                    getPackage(needInjectedFullClass),
+                    getClassName(needInjectedFullClass)
+                )
+            )
+            // 进行初始化工作
+            methodSpecBuilder.addStatement(
+                """sMap.put("$needInjectedInterface", instance)"""
+            )
+            methodSpecBuilder.addStatement("""return ($needInjectedInterface)instance""")
+
+            methodSpecBuilder.endControlFlow()
         } else {
             methodSpecBuilder.addStatement(
                 """return new ${'$'}T()""",
