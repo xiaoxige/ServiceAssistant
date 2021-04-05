@@ -13,7 +13,8 @@ java {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
-    api project(':ServiceAssistantAnnotation')
+//    api project(':ServiceAssistantAnnotation')
+    api 'cn.xiaoxige.serviceassistant:annotation:1.0.1'
     compileOnly 'com.google.auto.service:auto-service:1.0-rc6'
     kapt 'com.google.auto.service:auto-service:1.0-rc6'
     implementation 'com.squareup:javapoet:1.11.0'
@@ -21,7 +22,7 @@ dependencies {
 
 group = 'cn.xiaoxige.serviceassistant'
 archivesBaseName = 'processor'
-version = '1.0.0'
+version = '1.0.1'
 
 uploadArchives {
     repositories {

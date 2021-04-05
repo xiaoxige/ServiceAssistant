@@ -11,7 +11,8 @@ java {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    api project(':ServiceAssistantAnnotation')
+//    api project(':ServiceAssistantAnnotation')
+    api 'cn.xiaoxige.serviceassistant:annotation:1.0.1'
 }
 
 group = 'cn.xiaoxige.serviceassistant'
