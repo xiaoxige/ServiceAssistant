@@ -23,7 +23,7 @@ class AutoWriteProxy(
         val annotation =
             AnnotationSpec.builder(ClassName.get("androidx.annotation", "Keep")).build()
         // 构造方法
-        val constructorMethod = createConstructorMethod()
+        val constructorMethod = createInitMethod()
         // 属性
         val field = createField()
         // 方法
@@ -36,6 +36,7 @@ class AutoWriteProxy(
             .addMethod(constructorMethod)
             .addField(field)
             .addMethods(methods)
+            .addStaticBlock(CodeBlock.of("init();\n"))
             .build()
 
         JavaFile.builder(NAME_PACKAGE_AUTO_WRITE_CLASS, autoClass)
@@ -54,9 +55,9 @@ class AutoWriteProxy(
             .build()
     }
 
-    private fun createConstructorMethod(): MethodSpec {
-        val methodSpecBuilder = MethodSpec.constructorBuilder()
-            .addModifiers(Modifier.PUBLIC)
+    private fun createInitMethod(): MethodSpec {
+        val methodSpecBuilder = MethodSpec.methodBuilder("init")
+            .addModifiers(Modifier.PRIVATE, Modifier.STATIC, Modifier.FINAL)
             .addJavadoc("It mainly initializes the injection implementation of single instance.\n")
 
         needInjectedInfo.keys.forEach {

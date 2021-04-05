@@ -14,7 +14,7 @@ import cn.xiaoxige.serviceassistantannotation.NeedInjected
 class AboutRepoImpl : IAboutRepo {
 
     override fun getAboutInfo(): String {
-        return "my name is xiaoxige"
+        return "通过自动注入调用."
     }
 
 }

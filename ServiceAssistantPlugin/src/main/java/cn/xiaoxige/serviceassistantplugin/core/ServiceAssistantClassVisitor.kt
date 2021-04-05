@@ -1,6 +1,8 @@
 package cn.xiaoxige.serviceassistantplugin.core
 
 import cn.xiaoxige.serviceassistantplugin.constant.ServiceAssistantConstant
+import cn.xiaoxige.serviceassistantplugin.util.Logger
+import org.apache.commons.codec.digest.DigestUtils
 import org.objectweb.asm.*
 
 /**
@@ -18,6 +20,9 @@ class ServiceAssistantClassVisitor(
 
     private lateinit var mVisitorClassName: String
     private lateinit var mVisitorClassSignature: String
+    private var mIsInsertInitField = false
+    private var mIsAutoInitFieldName: String? = null
+    private val mFieldInfo = mutableMapOf<String, String>()
 
     fun visitor(): ByteArray {
         val classReader = ClassReader(byteArray)
@@ -38,6 +43,8 @@ class ServiceAssistantClassVisitor(
         super.visit(version, access, name, signature, superName, interfaces)
         this.mVisitorClassName = name ?: ""
         this.mVisitorClassSignature = signature ?: ""
+        this.mIsInsertInitField = false
+        this.mIsAutoInitFieldName = "is${DigestUtils.md5Hex(this.mVisitorClassName)}"
         if (this.mVisitorClassName == ServiceAssistantConstant.PATH_SERVICE_REFERENCE) {
             // is service
             serviceTargetFindBack.invoke()
@@ -51,13 +58,57 @@ class ServiceAssistantClassVisitor(
         signature: String?,
         value: Any?
     ): FieldVisitor {
-//        if (mVisitorClassName.indexOf("MainActivity") >= 0) {
-//            println("name: $name, desc: $descriptor, sign: $signature, value: ${value?.toString()}")
-//        }
-        return super.visitField(access, name, descriptor, signature, value)
+
+        return ServiceAssistantFieldVisitor(
+            super.visitField(
+                access,
+                name,
+                descriptor,
+                signature,
+                value
+            )
+        ) {
+            if (name == null) throw  RuntimeException("Failed to get injection variable name.")
+            if (descriptor == null) throw RuntimeException("Failed to get injection variable type.")
+            this.mFieldInfo[name] = descriptor
+            Logger.i("injected: $name -> $descriptor")
+
+            if (!this.mIsInsertInitField) {
+                cv.visitField(
+                    Opcodes.ACC_VOLATILE or Opcodes.ACC_PRIVATE,
+                    this.mIsAutoInitFieldName,
+                    ServiceAssistantConstant.SIGNATURE_BOOLEAN,
+                    null,
+                    false
+                ).visitEnd()
+                this.mIsInsertInitField = true
+            }
+        }
+    }
+
+    override fun visitMethod(
+        access: Int,
+        name: String?,
+        descriptor: String?,
+        signature: String?,
+        exceptions: Array<out String>?
+    ): MethodVisitor {
+        return if (name == null || name != ServiceAssistantConstant.DESC_INIT || this.mFieldInfo.isEmpty()) {
+            super.visitMethod(access, name, descriptor, signature, exceptions)
+        } else {
+            ServiceAssistantMethodVisitor(
+                super.visitMethod(access, name, descriptor, signature, exceptions),
+                this.mVisitorClassName,
+                this.mIsAutoInitFieldName!!,
+                this.mFieldInfo,
+                access, name, descriptor
+            )
+        }
+
     }
 
     override fun visitAnnotation(descriptor: String?, visible: Boolean): AnnotationVisitor {
+
         descriptor?.let {
 
             if (it.indexOf(ServiceAssistantConstant.SIGNATURE_SERVICE_ANNOTATION) < 0) return@let
@@ -82,6 +133,12 @@ class ServiceAssistantClassVisitor(
             )
         }
         return super.visitAnnotation(descriptor, visible)
+    }
+
+    override fun visitEnd() {
+        this.mIsInsertInitField = false
+        this.mIsAutoInitFieldName = null
+        super.visitEnd()
     }
 
 }

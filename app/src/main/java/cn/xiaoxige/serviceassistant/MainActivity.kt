@@ -2,6 +2,7 @@ package cn.xiaoxige.serviceassistant
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -11,6 +12,7 @@ import cn.xiaoxige.loginapi.IUserInfoApi
 import cn.xiaoxige.serviceassistant.ktx.requestAccountAbilityApi
 import cn.xiaoxige.serviceassistant.ktx.requestLoginAbilityApi
 import cn.xiaoxige.serviceassistant.repo.IAboutRepo
+import cn.xiaoxige.serviceassistant.repo.ISettingRepo
 import cn.xiaoxige.serviceassistantannotation.Injected
 import cn.xiaoxige.serviceassistantcore.Service
 
@@ -22,6 +24,9 @@ class MainActivity : AppCompatActivity() {
 
     @Injected
     private lateinit var mAboutRepo: IAboutRepo
+
+    @Injected
+    private lateinit var mSettingRepo: ISettingRepo
 
     private val mLoginStateListener = LoginStateChangeBack()
 
@@ -35,6 +40,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         registerListener()
+
+        Toast.makeText(this, mAboutRepo.getAboutInfo(), Toast.LENGTH_SHORT).show()
+        Log.e("TAG", mSettingRepo.getSettingInfo())
 
         // 列如 fragment 一般做法， 这里点到为止
         val accountFragment =
