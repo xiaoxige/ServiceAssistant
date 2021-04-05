@@ -6,7 +6,7 @@
 
 ## 主要功能
 * 支持组件之间通信
-* 支持数据注入（这个功能也必须安排上）
+* 支持数据注入（这个功能也必须安排上）（懒加载注入哦）
 
 ## 支持亮点
 * 库特别 mini， 核心库就几个类而已
@@ -51,7 +51,7 @@ apply plugin: 'kotlin-kapt'
 # 加入核心依赖
 dependencies {
 	implementation 'cn.xiaoxige.serviceassistant:core:1.0.1'
-	kapt 'cn.xiaoxige.serviceassistant:processor:1.0.1'
+	kapt 'cn.xiaoxige.serviceassistant:processor:1.0.2'
 }
 ```
 
@@ -224,6 +224,19 @@ class MainActivity : AppCompatActivity() {
 ```
 
 打完收工！！！
+
+## 更新日志
+
+### 注解处理器 processor （1.0.2）
+* 支持懒加载
+
+### 1.0.1
+* 支持了注入
+* 添加了 annotation 和 processor
+
+### 1.0.0
+* 主持组件化通讯
+* 加入 core 和 plugin
 
 ## 其他
 **关于组件的初始化、 组件之间跳转、 组件之间的通讯、 组件之间的回调等用法效果请运行 Demo 查看效果， 其用法请参考 Demo!!!**
