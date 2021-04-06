@@ -6,6 +6,7 @@ if (accountComponentIsApplication) {
     apply plugin: 'com.android.library'
 }
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 29
@@ -55,6 +56,8 @@ dependencies {
 
     implementation 'cn.xiaoxige.serviceassistant:core:1.0.1'
 //    implementation project(':ServiceAssistantCore')
+    kapt 'cn.xiaoxige.serviceassistant:processor:1.0.3'
+    //    kapt project(':ServiceAssistantProcessor')
     implementation project(':AccountApi')
     implementation project(':LoginApi')
     implementation project(':AppApi')

@@ -28,7 +28,7 @@ repositories {
     }
 
     dependencies {
-        classpath "cn.xiaoxige.serviceassistant:plugin:1.0.1"
+        classpath "cn.xiaoxige.serviceassistant:plugin:1.0.2"
     }
 }
 
@@ -51,9 +51,15 @@ apply plugin: 'kotlin-kapt'
 # 加入核心依赖
 dependencies {
 	implementation 'cn.xiaoxige.serviceassistant:core:1.0.1'
-	kapt 'cn.xiaoxige.serviceassistant:processor:1.0.2'
+	kapt 'cn.xiaoxige.serviceassistant:processor:1.0.3'
 }
 ```
+
+**注:**
+
+**1. 插件只需也仅仅要在 application 中加入**
+
+**2. 如果要使用注入功能， 记得要加上 kapt 依赖哈， 尤其在依赖库使用时不要忘记加入哦**
 
 至此配置完成， 开启组件之旅。
 
@@ -68,8 +74,8 @@ A 和 B 两个互不依赖的库（也包含 A 依赖 B, B 需要访问 A 的操
 |interface IService<T>|提供服务的服务的接口|
 |annotation class Service|提供服务的注解|
 |object Service| 服务获取|
-|NeedInjected| 提供注入的实现类的注解|
-|Injected| 变量注入注解|
+|annotation class NeedInjected| 提供注入的实现类的注解|
+|annotation class Injected| 变量注入注解|
 
 **提供能力的实现一定要继承 IService 接口！！！并加入 @Service 注解！！！**
 
@@ -227,7 +233,10 @@ class MainActivity : AppCompatActivity() {
 
 ## 更新日志
 
-### 注解处理器 processor （1.0.2）
+### processor (1.0.3), plugin (1.0.2)
+* 支持注入可在多 model 中使用
+
+### processor （1.0.2）
 * 支持懒加载
 
 ### 1.0.1

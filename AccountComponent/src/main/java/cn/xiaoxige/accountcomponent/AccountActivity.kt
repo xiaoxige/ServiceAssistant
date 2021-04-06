@@ -5,9 +5,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import cn.xiaoxige.accountcomponent.repo.IAccountRepo
 import cn.xiaoxige.appapi.IAppAbilityApi
 import cn.xiaoxige.loginapi.IUserInfoApi
+import cn.xiaoxige.serviceassistantannotation.Injected
 import cn.xiaoxige.serviceassistantcore.Service
 
 /**
@@ -19,6 +22,9 @@ import cn.xiaoxige.serviceassistantcore.Service
  */
 class AccountActivity : AppCompatActivity() {
 
+    @Injected
+    private lateinit var mAccountRepo: IAccountRepo
+
     private val tvUserInfo by lazy {
         findViewById<TextView>(R.id.tvUserInfo)
     }
@@ -29,6 +35,8 @@ class AccountActivity : AppCompatActivity() {
 
         registerListener()
         updateUserInfo()
+
+        Toast.makeText(this, mAccountRepo.getAccountData(), Toast.LENGTH_SHORT).show()
     }
 
     private fun registerListener() {

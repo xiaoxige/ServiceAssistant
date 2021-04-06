@@ -26,9 +26,6 @@ object ServiceAssistantConstant {
 
     const val PATH_SERVICE_CLASS = "cn/xiaoxige/serviceassistantcore/Service.class"
 
-    const val PATH_Auto_Injected_Producer =
-        "cn/xiaoxige/serviceassistantprocessor/AutoInjectedProducer"
-
     const val PATH_BOOLEAN = "java/lang/Boolean"
 
     const val SIGNATURE_INJECTED_ANNOTATION = "Lcn/xiaoxige/serviceassistantannotation/Injected;"
@@ -43,6 +40,8 @@ object ServiceAssistantConstant {
 
     const val NAME_NEED_INSERT_METHOD = "autoRegisterFromAnnotation"
 
+    const val NAME_GET_TARGET_INSTANCE_METHOD = "getInstance"
+
     const val DESC_INIT = "<init>"
 
     const val DESC_SIGNATURE_CONSTRUCTORS = "()V"
@@ -52,4 +51,7 @@ object ServiceAssistantConstant {
     const val DESC_RETURN_BOOLEAN_FULL = "(Z)Ljava/lang/Boolean;"
 
     const val DESC_VALUE_OF = "valueOf"
+
+    fun getInjectedProducerClassFullName(injectedInterface: String): String =
+        "${injectedInterface}Producer"
 }

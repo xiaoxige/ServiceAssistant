@@ -75,18 +75,25 @@ class ServiceAssistantMethodVisitor(
 
             mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null)
             mv.visitVarInsn(Opcodes.ALOAD, 0)
+            val signInterface = fieldInfo[it]
+                ?: throw RuntimeException("Injection target interface signature error")
             mv.visitMethodInsn(
                 Opcodes.INVOKESTATIC,
-                ServiceAssistantConstant.PATH_Auto_Injected_Producer,
-                findAutoCreateMethodName(fieldInfo[it] ?: ""),
-                "()${fieldInfo[it]}",
+                ServiceAssistantConstant.getInjectedProducerClassFullName(
+                    signInterface.substring(
+                        1,
+                        signInterface.length - 1
+                    )
+                ),
+                ServiceAssistantConstant.NAME_GET_TARGET_INSTANCE_METHOD,
+                "()$signInterface",
                 false
             )
             mv.visitFieldInsn(
                 Opcodes.PUTFIELD,
                 visitorClassName,
                 it,
-                "${fieldInfo[it]}"
+                signInterface
             )
             val label4 = Label()
             mv.visitLabel(label4)

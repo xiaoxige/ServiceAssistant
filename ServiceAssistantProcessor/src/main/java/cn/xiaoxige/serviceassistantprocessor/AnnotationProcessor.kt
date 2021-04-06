@@ -109,14 +109,18 @@ class AnnotationProcessor : AbstractProcessor() {
             }
         }
 
-        try {
-            AutoWriteProxy(mNeedInjectedInfo, mInjectedInfo, mFiler).write()
-        } catch (ex: Exception) {
-            e(ex.message.toString())
-        } finally {
-            mNeedInjectedInfo.clear()
-            mInjectedInfo.clear()
+        mInjectedInfo.keys.forEach {
+            val needInjectedInfo = mNeedInjectedInfo[it]
+            AutoWriteInjectedInfoProducer(
+                it,
+                needInjectedInfo,
+                mFiler
+            ).write()
         }
+
+        // 写完进行清理下
+        mNeedInjectedInfo.clear()
+        mInjectedInfo.clear()
 
         return true
     }
