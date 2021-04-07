@@ -5,7 +5,7 @@
 **为组件化而生， 可以轻松灵活实现组件之间的任何通信及交互。**
 
 ## 主要功能
-* 支持组件之间通信
+* 支持组件之间通信 (懒加载哦)
 * 支持数据注入（这个功能也必须安排上）（懒加载注入哦）
 
 ## 支持亮点
@@ -28,7 +28,7 @@ repositories {
     }
 
     dependencies {
-        classpath "cn.xiaoxige.serviceassistant:plugin:1.0.2"
+        classpath "cn.xiaoxige.serviceassistant:plugin:1.0.3"
     }
 }
 
@@ -50,7 +50,7 @@ apply plugin: 'kotlin-kapt'
 
 # 加入核心依赖
 dependencies {
-	implementation 'cn.xiaoxige.serviceassistant:core:1.0.1'
+	implementation 'cn.xiaoxige.serviceassistant:core:1.0.2'
 	kapt 'cn.xiaoxige.serviceassistant:processor:1.0.3'
 }
 ```
@@ -233,11 +233,14 @@ class MainActivity : AppCompatActivity() {
 
 ## 更新日志
 
-### processor (1.0.3), plugin (1.0.2)
+### plugin -> 1.0.3, core -> 1.0.2
+* 组件通讯支持懒加载
+
+### processor -> 1.0.3, plugin -> 1.0.2
 * 支持注入可在多 model 中使用
 
-### processor （1.0.2）
-* 支持懒加载
+### processor -> 1.0.2
+* 注入支持懒加载
 
 ### 1.0.1
 * 支持了注入
