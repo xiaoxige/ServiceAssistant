@@ -254,4 +254,4 @@ class MainActivity : AppCompatActivity() {
 **关于组件的初始化、 组件之间跳转、 组件之间的通讯、 组件之间的回调等用法效果请运行 Demo 查看效果， 其用法请参考 Demo!!!**
 
 
-**如果觉得有帮助， 欢迎 Star**
+**欢迎 Star**
