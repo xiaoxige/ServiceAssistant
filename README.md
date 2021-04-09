@@ -17,6 +17,14 @@
 * 轻松支持数据注入
 * 更加灵活（你想怎么都行）
 
+## 当前最新版本
+| name | desc|
+| :-: | :-:|
+|annotation| 1.0.2|
+|core| 1.0.3|
+|plugin|1.0.4|
+|processor| 1.0.4|
+
 ## 依赖
 在项目 gradle 中配置
 
@@ -28,7 +36,7 @@ repositories {
     }
 
     dependencies {
-        classpath "cn.xiaoxige.serviceassistant:plugin:1.0.3"
+        classpath "cn.xiaoxige.serviceassistant:plugin:xxx"
     }
 }
 
@@ -50,8 +58,8 @@ apply plugin: 'kotlin-kapt'
 
 # 加入核心依赖
 dependencies {
-	implementation 'cn.xiaoxige.serviceassistant:core:1.0.2'
-	kapt 'cn.xiaoxige.serviceassistant:processor:1.0.3'
+	implementation 'cn.xiaoxige.serviceassistant:core:xxx'
+	kapt 'cn.xiaoxige.serviceassistant:processor:xxx'
 }
 ```
 
@@ -232,6 +240,9 @@ class MainActivity : AppCompatActivity() {
 打完收工！！！
 
 ## 更新日志
+
+### annotation -> 1.0.2, core -> 1.0.3, plugin -> 1.0.4, processor -> 1.0.4
+* 注入支持跨 model 使用
 
 ### plugin -> 1.0.3, core -> 1.0.2
 * 组件通讯支持懒加载
