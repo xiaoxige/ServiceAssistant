@@ -21,7 +21,7 @@ class ServiceAssistantMethodVisitor(
     access: Int,
     name: String?,
     desc: String?
-) : AdviceAdapter(Opcodes.ASM5, methodVisitor, access, name, desc) {
+) : AdviceAdapter(Opcodes.ASM7, methodVisitor, access, name, desc) {
 
     override fun onMethodEnter() {
         super.onMethodEnter()

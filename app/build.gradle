@@ -37,14 +37,14 @@ android {
 dependencies {
 
     // 服务助手
-    implementation 'cn.xiaoxige.serviceassistant:core:1.0.2'
-//    implementation project(':ServiceAssistantCore')
+//    implementation 'cn.xiaoxige.serviceassistant:core:1.0.3'
+    implementation project(':ServiceAssistantCore')
     implementation project(':AppApi')
     implementation project(':LoginApi')
     implementation project(':AccountApi')
 
-//    kapt project(':ServiceAssistantProcessor')
-    kapt 'cn.xiaoxige.serviceassistant:processor:1.0.3'
+    kapt project(':ServiceAssistantProcessor')
+//    kapt 'cn.xiaoxige.serviceassistant:processor:1.0.4'
 
     // 登录组件
     if (loginComponentIsLibrary.toBoolean()) {

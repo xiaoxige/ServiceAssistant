@@ -14,7 +14,7 @@ class ServiceAssistantFieldVisitor(
     fieldVisitor: FieldVisitor,
     private val targetAnnotationBack: () -> Unit
 ) :
-    FieldVisitor(Opcodes.ASM5, fieldVisitor) {
+    FieldVisitor(Opcodes.ASM7, fieldVisitor) {
 
     override fun visitAnnotation(descriptor: String?, visible: Boolean): AnnotationVisitor {
         if (ServiceAssistantConstant.SIGNATURE_INJECTED_ANNOTATION == descriptor) {

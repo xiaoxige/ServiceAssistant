@@ -9,4 +9,4 @@ package cn.xiaoxige.serviceassistantannotation
  */
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Injected(val isForce: Boolean = true)
+annotation class Injected

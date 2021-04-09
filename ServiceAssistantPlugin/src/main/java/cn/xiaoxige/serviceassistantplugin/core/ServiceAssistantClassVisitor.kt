@@ -16,7 +16,7 @@ class ServiceAssistantClassVisitor(
     private val byteArray: ByteArray,
     private val serviceTargetFindBack: () -> Unit,
     private val needScanClassInfoBack: (String, String) -> Unit
-) : ClassVisitor(Opcodes.ASM5) {
+) : ClassVisitor(Opcodes.ASM7) {
 
     private lateinit var mVisitorClassName: String
     private lateinit var mVisitorClassSignature: String

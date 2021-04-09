@@ -15,7 +15,7 @@ dependencies {
 
 group = 'cn.xiaoxige.serviceassistant'
 archivesBaseName = 'annotation'
-version = '1.0.1'
+version = '1.0.2'
 
 uploadArchives {
     repositories {

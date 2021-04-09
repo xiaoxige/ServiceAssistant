@@ -17,7 +17,7 @@ class ServiceClassMethodVisitor(
     private val needInsertInfo: List<Pair<String, String>>,
     methodVisitor: MethodVisitor, access: Int, name: String?, desc: String?
 ) :
-    AdviceAdapter(Opcodes.ASM5, methodVisitor, access, name, desc) {
+    AdviceAdapter(Opcodes.ASM7, methodVisitor, access, name, desc) {
 
     override fun onMethodExit(opcode: Int) {
         super.onMethodExit(opcode)

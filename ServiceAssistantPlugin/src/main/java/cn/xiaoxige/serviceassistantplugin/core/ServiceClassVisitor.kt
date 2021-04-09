@@ -14,7 +14,7 @@ class ServiceClassVisitor(
     private val byteArray: ByteArray,
     private val needInsertInfo: List<Pair<String, String>>
 ) :
-    ClassVisitor(Opcodes.ASM5) {
+    ClassVisitor(Opcodes.ASM7) {
 
     fun visitor(): ByteArray {
         val classReader = ClassReader(byteArray)
