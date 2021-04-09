@@ -157,7 +157,7 @@ class ServiceAssistantTransform : Transform() {
             "$md5Name$name", jarInput.contentTypes, jarInput.scopes, Format.JAR
         )
 
-        val tempFileName = "$name-temp"
+        val tempFileName = "${md5Name}Tmp"
         val tempFile = File("${file.parent}${File.separator}${tempFileName}")
 
         val jarFile = JarFile(file)

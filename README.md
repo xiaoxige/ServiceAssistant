@@ -22,7 +22,7 @@
 | :-: | :-:|
 |annotation| 1.0.2|
 |core| 1.0.3|
-|plugin|1.0.4|
+|plugin|1.0.5|
 |processor| 1.0.4|
 
 ## 依赖
@@ -240,6 +240,9 @@ class MainActivity : AppCompatActivity() {
 打完收工！！！
 
 ## 更新日志
+
+### plugin -> 1.0.5
+* 解决部分 windows 系统编译失败问题
 
 ### annotation -> 1.0.2, core -> 1.0.3, plugin -> 1.0.4, processor -> 1.0.4
 * 注入支持跨 model 使用
