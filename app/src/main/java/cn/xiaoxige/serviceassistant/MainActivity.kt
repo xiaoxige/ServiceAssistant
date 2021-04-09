@@ -28,6 +28,9 @@ class MainActivity : AppCompatActivity() {
     @Injected
     private lateinit var mSettingRepo: ISettingRepo
 
+//    @Injected
+//    private lateinit var mAccountRepo: IAccountRepo
+
     private val mLoginStateListener = LoginStateChangeBack()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,6 +46,7 @@ class MainActivity : AppCompatActivity() {
 
         Toast.makeText(this, mAboutRepo.getAboutInfo(), Toast.LENGTH_SHORT).show()
         Log.e("TAG", mSettingRepo.getSettingInfo())
+//        Log.e("TAG", mAccountRepo.getAccountData())
 
         // 列如 fragment 一般做法， 这里点到为止
         val accountFragment =

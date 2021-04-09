@@ -26,106 +26,109 @@ class ServiceAssistantMethodVisitor(
     override fun onMethodEnter() {
         super.onMethodEnter()
 
-        val label0 = Label()
-        val label1 = Label()
-        val label2 = Label()
-        mv.visitTryCatchBlock(label0, label1, label2, "java/lang/Exception")
-        val label3 = Label()
-        mv.visitLabel(label3)
-
         mv.visitInsn(ACONST_NULL)
         mv.visitVarInsn(ALOAD, 0)
         mv.visitFieldInsn(
             GETFIELD,
             visitorClassName,
             isAutoInitFieldName,
-            "Ljava/lang/Boolean;"
+            ServiceAssistantConstant.SIGNATURE_BOOLEAN
         )
-        mv.visitJumpInsn(IF_ACMPEQ, label0)
+        val label1 = Label()
+        mv.visitJumpInsn(IF_ACMPEQ, label1)
         mv.visitVarInsn(ALOAD, 0)
         mv.visitFieldInsn(
             GETFIELD,
             visitorClassName,
             isAutoInitFieldName,
-            "Ljava/lang/Boolean;"
+            ServiceAssistantConstant.SIGNATURE_BOOLEAN
         )
         mv.visitMethodInsn(
             INVOKEVIRTUAL,
-            "java/lang/Boolean",
-            "booleanValue",
-            "()Z",
+            ServiceAssistantConstant.PATH_BOOLEAN,
+            ServiceAssistantConstant.NAME_BOOLEAN,
+            ServiceAssistantConstant.DESC_RETURN_BOOLEAN,
             false
         )
-        val label4 = Label()
-        mv.visitJumpInsn(IFNE, label4)
-        mv.visitLabel(label0)
+        val label2 = Label()
+        mv.visitJumpInsn(IFNE, label2)
+        mv.visitLabel(label1)
 
         fieldInfo.keys.forEach {
-
-            val signInterface = fieldInfo[it]
+            val value = fieldInfo[it]
                 ?: throw RuntimeException("Injection target interface signature error")
-
-            val targetInterfaceProducer = ServiceAssistantConstant.getInjectedProducerClassFullName(
-                signInterface.substring(
-                    1,
-                    signInterface.length - 1
-                )
-            )
-
-            mv.visitFrame(F_SAME, 0, null, 0, null)
-            mv.visitLdcInsn(targetInterfaceProducer.replace("/", "."))
-            mv.visitMethodInsn(
-                INVOKESTATIC,
-                "java/lang/Class",
-                "forName",
-                "(Ljava/lang/String;)Ljava/lang/Class;",
-                false
-            )
-            mv.visitInsn(POP)
-            val label5 = Label()
-            mv.visitLabel(label5)
-            mv.visitVarInsn(ALOAD, 0)
-            mv.visitMethodInsn(
-                INVOKESTATIC,
-                targetInterfaceProducer,
-                "getInstance",
-                "()$signInterface",
-                false
-            )
-            mv.visitFieldInsn(
-                PUTFIELD,
-                visitorClassName,
-                it,
-                signInterface
-            )
-            mv.visitLabel(label1)
-            val label6 = Label()
-            mv.visitJumpInsn(GOTO, label6)
-            mv.visitLabel(label2)
-            mv.visitFrame(F_SAME1, 0, null, 1, arrayOf<Any>("java/lang/Exception"))
-            mv.visitVarInsn(ASTORE, 1)
-            mv.visitLabel(label6)
-
+            insertInjectedProducer(it, value)
         }
 
-        mv.visitFrame(F_SAME, 0, null, 0, null)
         mv.visitVarInsn(ALOAD, 0)
         mv.visitInsn(ICONST_1)
         mv.visitMethodInsn(
             INVOKESTATIC,
-            "java/lang/Boolean",
-            "valueOf",
-            "(Z)Ljava/lang/Boolean;",
+            ServiceAssistantConstant.PATH_BOOLEAN,
+            ServiceAssistantConstant.DESC_VALUE_OF,
+            ServiceAssistantConstant.DESC_RETURN_BOOLEAN_FULL,
             false
         )
         mv.visitFieldInsn(
             PUTFIELD,
             visitorClassName,
             isAutoInitFieldName,
-            "Ljava/lang/Boolean;"
+            ServiceAssistantConstant.SIGNATURE_BOOLEAN
         )
-        mv.visitLabel(label4)
+        mv.visitLabel(label2)
 
+    }
+
+    private fun insertInjectedProducer(name: String, injectedInterface: String) {
+
+        val targetInterfaceProducer = ServiceAssistantConstant.getInjectedProducerClassFullName(
+            injectedInterface.substring(
+                1,
+                injectedInterface.length - 1
+            )
+        )
+
+        val label0 = Label()
+        val label1 = Label()
+        val label2 = Label()
+        mv.visitTryCatchBlock(label0, label1, label2, ServiceAssistantConstant.PATH_EXCEPTION)
+        mv.visitLabel(label0)
+        mv.visitLineNumber(33, label0)
+        mv.visitLdcInsn(targetInterfaceProducer.replace("/", "."))
+        mv.visitMethodInsn(
+            INVOKESTATIC,
+            ServiceAssistantConstant.PATH_CLASS,
+            ServiceAssistantConstant.DESC_FOR_NAME,
+            ServiceAssistantConstant.SIGNATURE_STRING_CLASS,
+            false
+        )
+        mv.visitInsn(POP)
+        val label3 = Label()
+        mv.visitLabel(label3)
+        mv.visitLineNumber(34, label3)
+        mv.visitVarInsn(ALOAD, 0)
+        mv.visitMethodInsn(
+            INVOKESTATIC,
+            targetInterfaceProducer,
+            ServiceAssistantConstant.NAME_GET_TARGET_INSTANCE_METHOD,
+            "()$injectedInterface",
+            false
+        )
+        mv.visitFieldInsn(
+            PUTFIELD,
+            visitorClassName,
+            name,
+            injectedInterface
+        )
+        mv.visitLabel(label1)
+        mv.visitLineNumber(36, label1)
+        val label4 = Label()
+        mv.visitJumpInsn(GOTO, label4)
+        mv.visitLabel(label2)
+        mv.visitLineNumber(35, label2)
+        mv.visitFrame(F_SAME1, 0, null, 1, arrayOf<Any>(ServiceAssistantConstant.PATH_EXCEPTION))
+        mv.visitVarInsn(ASTORE, 1)
+        mv.visitLabel(label4)
     }
 
 }
