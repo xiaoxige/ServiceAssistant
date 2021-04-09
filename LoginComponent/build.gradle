@@ -2,6 +2,7 @@ def loginComponentIsApplication = !loginComponentIsLibrary.toBoolean()
 
 if (loginComponentIsApplication) {
     apply plugin: 'com.android.application'
+    apply plugin: 'service-assistant'
 } else {
     apply plugin: 'com.android.library'
 }

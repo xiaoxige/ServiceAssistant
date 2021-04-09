@@ -2,6 +2,7 @@ def accountComponentIsApplication = !accountComponentIsLibrary.toBoolean()
 
 if (accountComponentIsApplication) {
     apply plugin: 'com.android.application'
+    apply plugin: 'service-assistant'
 } else {
     apply plugin: 'com.android.library'
 }
