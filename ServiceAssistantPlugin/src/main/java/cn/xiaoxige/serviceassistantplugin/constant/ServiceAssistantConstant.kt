@@ -17,8 +17,6 @@ object ServiceAssistantConstant {
 
     const val SIGNATURE_I_SERVICE = "Lcn/xiaoxige/serviceassistantcore/IService"
 
-    const val PATH_INTRINSICS = "kotlin/jvm/internal/Intrinsics"
-
     const val PATH_SERVICE_REFERENCE = "cn/xiaoxige/serviceassistantcore/Service"
 
     const val PATH_SERVICE_CLASS = "cn/xiaoxige/serviceassistantcore/Service.class"
@@ -34,6 +32,8 @@ object ServiceAssistantConstant {
     const val PATH_OBJECT = "java/lang/Object"
 
     const val PATH_THROWABLE = "java/lang/Throwable"
+
+    const val PATH_EXCEPTION = "java/lang/Exception"
 
     const val SIGNATURE_INJECTED_ANNOTATION = "Lcn/xiaoxige/serviceassistantannotation/Injected;"
 
@@ -52,13 +52,13 @@ object ServiceAssistantConstant {
     const val SIGNATURE_OBJECT_OBJECT_OBJECT =
         "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"
 
+    const val SIGNATURE_STRING_CLASS = "(Ljava/lang/String;)Ljava/lang/Class;"
+
     const val SIGNATURE_OBJECT_BOOLEAN = "(Ljava/lang/Object;)Z"
 
     const val SIGNATURE_CLASS_T_T = "Ljava/lang/Class<TT;>;"
 
     const val NAME_BOOLEAN = "booleanValue"
-
-    const val NAME_THROW_NPE = "throwNpe"
 
     const val NAME_NEED_INSERT_METHOD = "getService"
 
@@ -77,6 +77,8 @@ object ServiceAssistantConstant {
     const val DESC_VALUE_OF = "valueOf"
 
     const val DESC_GET_NAME = "getName"
+
+    const val DESC_FOR_NAME = "forName"
 
     const val DESC_GET = "get"
 
