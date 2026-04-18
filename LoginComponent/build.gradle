@@ -54,8 +54,8 @@ android {
 
 dependencies {
 
-    implementation 'cn.xiaoxige.serviceassistant:core:1.0.3'
-//    implementation project(':ServiceAssistantCore')
+//    implementation 'cn.xiaoxige.serviceassistant:core:1.0.3'
+    implementation project(':ServiceAssistantCore')
     implementation project(':LoginApi')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"

@@ -2,7 +2,7 @@ plugins {
     id 'java-library'
     id 'kotlin'
     id 'groovy'
-    id 'maven'
+    id 'maven-publish'
 }
 
 java {
@@ -22,10 +22,15 @@ group = 'cn.xiaoxige.serviceassistant'
 archivesBaseName = 'plugin'
 version = '1.0.5'
 
-uploadArchives {
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
     repositories {
-        mavenDeployer {
-            repository(url: uri('../plugin'))
+        maven {
+            url = uri('../plugin')
         }
     }
 }

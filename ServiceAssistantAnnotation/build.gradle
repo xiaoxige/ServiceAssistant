@@ -1,7 +1,7 @@
 plugins {
     id 'java-library'
     id 'kotlin'
-    id 'maven'
+    id 'maven-publish'
 }
 
 java {
@@ -17,10 +17,15 @@ group = 'cn.xiaoxige.serviceassistant'
 archivesBaseName = 'annotation'
 version = '1.0.2'
 
-uploadArchives {
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
     repositories {
-        mavenDeployer {
-            repository(url: uri('../plugin'))
+        maven {
+            url = uri('../plugin')
         }
     }
 }
