@@ -1,6 +1,8 @@
 package cn.xiaoxige.serviceassistantplugin.constant
 
 import com.android.tools.r8.Keep
+import org.objectweb.asm.Type
+import org.objectweb.asm.commons.Method
 
 /**
  * @author xiaoxige
@@ -11,6 +13,23 @@ import com.android.tools.r8.Keep
  */
 @Keep
 object ServiceAssistantConstant {
+
+    // ---------- ASM Type ----------
+
+    fun classType(): Type = Type.getType(Class::class.java)
+    fun stringType(): Type = Type.getType(String::class.java)
+    fun objectType(): Type = Type.getType(Any::class.java)
+    fun mapType(): Type = Type.getType(Map::class.java)
+    fun throwableType(): Type = Type.getType(Throwable::class.java)
+    fun serviceType(): Type = Type.getObjectType(PATH_SERVICE_REFERENCE)
+
+    // ---------- ASM Method ----------
+
+    fun getNameMethod(): Method = Method.getMethod("String getName()")
+    fun mapGetMethod(): Method = Method.getMethod("Object get(Object)")
+    fun mapPutMethod(): Method = Method.getMethod("Object put(Object, Object)")
+    fun equalsMethod(): Method = Method.getMethod("boolean equals(Object)")
+    fun initMethod(): Method = Method.getMethod("void <init>()")
 
     const val SIGNATURE_SERVICE_ANNOTATION =
         "Lcn/xiaoxige/serviceassistantcore/annotation/Service"
@@ -51,6 +70,9 @@ object ServiceAssistantConstant {
 
     const val SIGNATURE_OBJECT_OBJECT_OBJECT =
         "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"
+
+    const val SIGNATURE_CLASS_OBJECT =
+        "(Ljava/lang/Class;)Ljava/lang/Object;"
 
     const val SIGNATURE_STRING_CLASS = "(Ljava/lang/String;)Ljava/lang/Class;"
 

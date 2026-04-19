@@ -1,12 +1,12 @@
 package cn.xiaoxige.serviceassistantplugin.core
 
+import cn.xiaoxige.serviceassistantplugin.constant.ServiceAssistantConstant
 import org.objectweb.asm.Handle
 import org.objectweb.asm.Label
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 import org.objectweb.asm.commons.GeneratorAdapter
-import org.objectweb.asm.commons.Method
 
 /**
  * @author xiaoxige
@@ -28,20 +28,18 @@ class ServiceClassMethodVisitor(
 ) : MethodVisitor(Opcodes.ASM7, mv) {
 
     companion object {
-        private val CLASS_TYPE = Type.getType(Class::class.java)
-        private val STRING_TYPE = Type.getType(String::class.java)
-        private val OBJECT_TYPE = Type.getType(Any::class.java)
-        private val MAP_TYPE = Type.getType(Map::class.java)
-        private val THROWABLE_TYPE = Type.getType(Throwable::class.java)
+        private val CLASS_TYPE = ServiceAssistantConstant.classType()
+        private val STRING_TYPE = ServiceAssistantConstant.stringType()
+        private val OBJECT_TYPE = ServiceAssistantConstant.objectType()
+        private val MAP_TYPE = ServiceAssistantConstant.mapType()
+        private val THROWABLE_TYPE = ServiceAssistantConstant.throwableType()
+        private val SERVICE_TYPE = ServiceAssistantConstant.serviceType()
 
-        private val SERVICE_TYPE =
-            Type.getObjectType("cn/xiaoxige/serviceassistantcore/Service")
-
-        private val GET_NAME = Method.getMethod("String getName()")
-        private val MAP_GET = Method.getMethod("Object get(Object)")
-        private val MAP_PUT = Method.getMethod("Object put(Object, Object)")
-        private val EQUALS = Method.getMethod("boolean equals(Object)")
-        private val INIT = Method.getMethod("void <init>()")
+        private val GET_NAME = ServiceAssistantConstant.getNameMethod()
+        private val MAP_GET = ServiceAssistantConstant.mapGetMethod()
+        private val MAP_PUT = ServiceAssistantConstant.mapPutMethod()
+        private val EQUALS = ServiceAssistantConstant.equalsMethod()
+        private val INIT = ServiceAssistantConstant.initMethod()
     }
 
     override fun visitCode() {
@@ -152,15 +150,21 @@ class ServiceClassMethodVisitor(
         gen.mark(methodEnd)
 
         gen.visitLocalVariable(
-            "clazz", "Ljava/lang/Class;", "Ljava/lang/Class<TT;>;",
+            ServiceAssistantConstant.DESC_CLAZZ,
+            ServiceAssistantConstant.SIGNATURE_CLASS,
+            ServiceAssistantConstant.SIGNATURE_CLASS_T_T,
             methodStart, methodEnd, 0
         )
         gen.visitLocalVariable(
-            "name", "Ljava/lang/String;", null,
+            ServiceAssistantConstant.DESC_NAME,
+            ServiceAssistantConstant.SIGNATURE_STRING,
+            null,
             methodStart, methodEnd, nameVar
         )
         gen.visitLocalVariable(
-            "service", "Ljava/lang/Object;", null,
+            ServiceAssistantConstant.DESC_SERVICE,
+            ServiceAssistantConstant.SIGNATURE_OBJECT,
+            null,
             methodStart, methodEnd, serviceVar
         )
 
