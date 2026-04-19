@@ -18,12 +18,12 @@
 * 更加灵活（你想怎么都行）
 
 ## 当前最新版本
-| name | desc|
-| :-: | :-:|
-|annotation| 1.0.2|
-|core| 1.0.3|
-|plugin|1.0.5|
-|processor| 1.0.4|
+| name | desc  |
+| :-: |:-----:|
+|annotation| 2.0.0 |
+|core| 2.0.0 |
+|plugin| 2.0.0 |
+|processor| 2.0.0 |
 
 ## 依赖
 在项目 gradle 中配置
@@ -240,6 +240,10 @@ class MainActivity : AppCompatActivity() {
 打完收工！！！
 
 ## 更新日志
+
+### annotation -> 1.0.2, core -> 1.0.3, plugin -> 1.0.4, processor -> 1.0.4
+* 升级了 gradle 版本 **7.5**,  gradle plugin 版本 **7.4.2**
+* 支持注入指定 sign, 即一个接口多种实现的支持
 
 ### plugin -> 1.0.5
 * 解决部分 windows 系统编译失败问题
