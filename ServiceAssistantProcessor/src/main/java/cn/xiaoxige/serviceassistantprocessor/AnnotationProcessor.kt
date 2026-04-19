@@ -25,7 +25,7 @@ class AnnotationProcessor : AbstractProcessor() {
     private lateinit var mMessage: Messager
     private lateinit var mTypeUtils: Types
 
-    private val mNeedInjectedInfo = mutableMapOf<String, List<Triple<String, Boolean, String>>>()
+    private val mNeedInjectedInfo = mutableMapOf<String, MutableList<Triple<String, Boolean, String>>>()
 
     override fun init(p0: ProcessingEnvironment?) {
         super.init(p0)
@@ -109,7 +109,7 @@ class AnnotationProcessor : AbstractProcessor() {
             return false
         }
         synchronized(this) {
-            var infos = mNeedInjectedInfo[interfacePath]?.toMutableList()
+            var infos = mNeedInjectedInfo[interfacePath]
             if (infos == null) {
                 infos = mutableListOf()
                 mNeedInjectedInfo[interfacePath] = infos
