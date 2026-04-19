@@ -42,7 +42,11 @@ class ServiceClassMethodVisitor(
         private val INIT = ServiceAssistantConstant.initMethod()
     }
 
+    private var hasGenerated = false
+
     override fun visitCode() {
+        if (hasGenerated) return
+        hasGenerated = true
         mv.visitCode()
 
         // 临时用 GeneratorAdapter 辅助生成指令，输出直接写给底层 mv
@@ -167,9 +171,6 @@ class ServiceClassMethodVisitor(
             null,
             methodStart, methodEnd, serviceVar
         )
-
-        mv.visitMaxs(0, 0)
-        mv.visitEnd()
     }
 
     // 拦截原方法体（return null）的所有指令，防止重复写入
@@ -188,6 +189,12 @@ class ServiceClassMethodVisitor(
     override fun visitLookupSwitchInsn(dflt: Label?, keys: IntArray?, labels: Array<out Label>?) {}
     override fun visitMultiANewArrayInsn(descriptor: String?, numDimensions: Int) {}
     override fun visitFrame(type: Int, numLocal: Int, local: Array<out Any>?, numStack: Int, stack: Array<out Any>?) {}
-    override fun visitMaxs(maxStack: Int, maxLocals: Int) {}
-    override fun visitEnd() {}
+
+    override fun visitMaxs(maxStack: Int, maxLocals: Int) {
+        mv.visitMaxs(0, 0)
+    }
+
+    override fun visitEnd() {
+        mv.visitEnd()
+    }
 }

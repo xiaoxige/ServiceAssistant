@@ -1,6 +1,5 @@
 package cn.xiaoxige.serviceassistantplugin.constant
 
-import com.android.tools.r8.Keep
 import org.objectweb.asm.Type
 import org.objectweb.asm.commons.Method
 
@@ -11,7 +10,6 @@ import org.objectweb.asm.commons.Method
  * email: xiaoxigexiaoan@outlook.com
  * desc: 常量
  */
-@Keep
 object ServiceAssistantConstant {
 
     // ---------- ASM Type ----------

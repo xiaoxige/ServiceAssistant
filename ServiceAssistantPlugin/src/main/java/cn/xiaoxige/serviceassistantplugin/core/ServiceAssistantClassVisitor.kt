@@ -2,8 +2,8 @@ package cn.xiaoxige.serviceassistantplugin.core
 
 import cn.xiaoxige.serviceassistantplugin.constant.ServiceAssistantConstant
 import cn.xiaoxige.serviceassistantplugin.util.Logger
-import org.apache.commons.codec.digest.DigestUtils
 import org.objectweb.asm.*
+import java.security.MessageDigest
 
 /**
  * @author xiaoxige
@@ -26,7 +26,7 @@ class ServiceAssistantClassVisitor(
 
     fun visitor(): ByteArray {
         val classReader = ClassReader(byteArray)
-        val classWriter = ClassWriter(classReader, ClassWriter.COMPUTE_MAXS)
+        val classWriter = SafeClassWriter(classReader, ClassWriter.COMPUTE_FRAMES)
         cv = classWriter
         classReader.accept(this, ClassReader.EXPAND_FRAMES)
         return classWriter.toByteArray()
@@ -44,7 +44,7 @@ class ServiceAssistantClassVisitor(
         this.mVisitorClassName = name ?: ""
         this.mVisitorClassSignature = signature ?: ""
         this.mIsInsertInitField = false
-        this.mIsAutoInitFieldName = "is${DigestUtils.md5Hex(this.mVisitorClassName)}"
+        this.mIsAutoInitFieldName = "is${md5Hex(this.mVisitorClassName)}"
         if (this.mVisitorClassName == ServiceAssistantConstant.PATH_SERVICE_REFERENCE) {
             // is service
             serviceTargetFindBack.invoke()
@@ -141,4 +141,10 @@ class ServiceAssistantClassVisitor(
         super.visitEnd()
     }
 
+}
+
+private fun md5Hex(input: String): String {
+    val md = MessageDigest.getInstance("MD5")
+    return md.digest(input.toByteArray(Charsets.UTF_8))
+        .joinToString("") { "%02x".format(it) }
 }

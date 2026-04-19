@@ -55,9 +55,9 @@ android {
 
 dependencies {
 
-    implementation 'cn.xiaoxige.serviceassistant:core:2.0.0'
+    implementation 'cn.xiaoxige.serviceassistant:core:3.0.0'
 //    implementation project(':ServiceAssistantCore')
-    kapt 'cn.xiaoxige.serviceassistant:processor:2.0.0'
+    kapt 'cn.xiaoxige.serviceassistant:processor:3.0.0'
 //    kapt project(':ServiceAssistantProcessor')
     implementation project(':AccountApi')
     implementation project(':LoginApi')

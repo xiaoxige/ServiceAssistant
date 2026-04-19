@@ -18,9 +18,9 @@ class ServiceClassVisitor(
 
     fun visitor(): ByteArray {
         val classReader = ClassReader(byteArray)
-        val classWriter = ClassWriter(classReader, ClassWriter.COMPUTE_MAXS)
+        val classWriter = SafeClassWriter(classReader, ClassWriter.COMPUTE_FRAMES)
         cv = classWriter
-        classReader.accept(this, ClassReader.EXPAND_FRAMES)
+        classReader.accept(this, ClassReader.SKIP_FRAMES)
         return classWriter.toByteArray()
     }
 
