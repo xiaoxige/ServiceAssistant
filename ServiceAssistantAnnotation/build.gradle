@@ -15,11 +15,13 @@ dependencies {
 
 group = 'cn.xiaoxige.serviceassistant'
 archivesBaseName = 'annotation'
-version = '1.0.2'
+version = '2.0.0'
 
 publishing {
     publications {
         maven(MavenPublication) {
+            groupId = group
+            artifactId = archivesBaseName
             from components.java
         }
     }
