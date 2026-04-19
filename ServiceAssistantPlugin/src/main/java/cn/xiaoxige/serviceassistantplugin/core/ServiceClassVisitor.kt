@@ -31,7 +31,8 @@ class ServiceClassVisitor(
         signature: String?,
         exceptions: Array<out String>?
     ): MethodVisitor {
-        return if (ServiceAssistantConstant.NAME_NEED_INSERT_METHOD == name) {
+        return if (ServiceAssistantConstant.NAME_NEED_INSERT_METHOD == name
+            && descriptor == "(Ljava/lang/Class;)Ljava/lang/Object;") {
             ServiceClassMethodVisitor(
                 needInsertInfo,
                 super.visitMethod(
