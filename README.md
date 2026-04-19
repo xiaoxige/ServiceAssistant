@@ -20,10 +20,10 @@
 ## 当前最新版本
 | name | desc  |
 | :-: |:-----:|
-|annotation| 2.0.0 |
-|core| 2.0.0 |
-|plugin| 2.0.0 |
-|processor| 2.0.0 |
+|annotation| 3.1.0 |
+|core| 3.1.0 |
+|plugin| 3.1.0 |
+|processor| 3.1.0 |
 
 ## 依赖
 在项目 gradle 中配置
