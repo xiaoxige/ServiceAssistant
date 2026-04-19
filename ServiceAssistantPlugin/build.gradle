@@ -24,7 +24,7 @@ dependencies {
 }
 
 group = 'cn.xiaoxige.serviceassistant'
-version = '3.0.0'
+version = '3.1.0'
 
 base {
     archivesName = 'plugin'

@@ -237,11 +237,15 @@ class MainActivity : AppCompatActivity() {
 }
 ```
 
-打完收工！！！
-
 ## 更新日志
 
-### annotation -> 1.0.2, core -> 1.0.3, plugin -> 1.0.4, processor -> 1.0.4
+### annotation -> 3.1.0, core -> 3.1.0, plugin -> 3.1.0, processor -> 3.1.0
+* 升级到 gradle 8.x 打包
+
+### annotation -> 3.0.0, core -> 3.0.0, plugin -> 3.0.0, processor -> 3.0.0
+* 兼容 gradle 8.x 
+
+### annotation -> 2.0.0, core -> 2.0.0, plugin -> 2.0.0, processor -> 2.0.0
 * 升级了 gradle 版本 **7.5**,  gradle plugin 版本 **7.4.2**
 * 支持注入指定 sign, 即一个接口多种实现的支持
 
