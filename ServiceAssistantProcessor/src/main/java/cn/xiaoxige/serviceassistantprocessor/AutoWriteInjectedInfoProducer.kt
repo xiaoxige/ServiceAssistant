@@ -14,50 +14,89 @@ import javax.lang.model.element.Modifier
  */
 class AutoWriteInjectedInfoProducer(
     private val injectedInterface: String,
-    private val needInjectedInfo: Pair<String, Boolean>?,
+    private val needInjectedInfos: List<Triple<String, Boolean, String>>?,
     private val filer: Filer
 ) {
 
     fun write() {
 
         // 生成类相关的信息
+        // cn.xiaoxige.xxx.IXxxProducer
         val injectedInfoProducerFullClass = getInjectedProducerClassFullName()
+        // pair<"cn.xiaoxige.xxx", "IXxxProducer">
         val injectedInfoProducerFullClassInfo =
             injectedInfoProducerFullClass.getPackageAndClassName()
 
         // 目标接口信息
+        // pair<"cn.xiaoxige.xxx", "IXxx">
         val injectedInterfaceInfo = injectedInterface.getPackageAndClassName()
 
         // 注解
+        // @androidx.annotation.Keep
         val annotation =
             AnnotationSpec.builder(ClassName.get("androidx.annotation", "Keep")).build()
 
         // 属性
-        val field = createField(
-            injectedInterfaceInfo.first,
-            injectedInterfaceInfo.second
-        )
+        // cn.xiaoxige.xxx.IXxx fieldXxx
+        // cn.xiaoxige.xxx.IXxx fieldXxxx
+        val fields = mutableListOf<FieldSpec>()
+        needInjectedInfos?.forEach {
+            fields.add(
+                createField(
+                    injectedInterfaceInfo.first,
+                    injectedInterfaceInfo.second,
+                    it
+                )
+            )
+        }
+
+        // lock 属性
+        // Object cLock
         val lockField = createLockField()
 
         // 方法
-        val method = createMethod(injectedInterfaceInfo)
+        // getInstance()
+        val getInstanceMethod = createGetInstanceMethod(injectedInterfaceInfo)
+        // getInstance(sign: String)
+        val getInstanceBySignMethod = createGetInstanceBySignMethod(injectedInterfaceInfo)
 
-        val autoClass = TypeSpec.classBuilder(injectedInfoProducerFullClassInfo.second)
+        // createXxxx()
+        val createTargetMethods = mutableListOf<MethodSpec>()
+        needInjectedInfos?.forEach {
+            createTargetMethods.add(createTargetMethod(injectedInterfaceInfo, it))
+        }
+
+        val autoClassBuilder = TypeSpec.classBuilder(injectedInfoProducerFullClassInfo.second)
             .addJavadoc("This class is a Service Assistant Processor transfer center class.\n which is automatically generated. Please do not make any changes.\n")
             .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
             .addAnnotation(annotation)
             .addField(lockField)
-            .addField(field)
-            .addMethod(method)
-            .build()
+            .addMethod(getInstanceMethod)
+            .addMethod(getInstanceBySignMethod)
 
+        fields.forEach {
+            autoClassBuilder.addField(it)
+        }
+
+        createTargetMethods.forEach {
+            autoClassBuilder.addMethod(it)
+        }
+
+        val autoClass = autoClassBuilder.build()
         JavaFile.builder(injectedInfoProducerFullClassInfo.first, autoClass)
             .build().writeTo(filer)
     }
 
-    private fun createField(packageInfo: String, className: String): FieldSpec {
-        return FieldSpec.builder(ClassName.get(packageInfo, className), NAME_TARGET_INSTANCE)
-            .addModifiers(Modifier.STATIC, Modifier.PRIVATE)
+    private fun createField(
+        packageInfo: String,
+        className: String,
+        target: Triple<String, Boolean, String>
+    ): FieldSpec {
+        return FieldSpec.builder(
+            ClassName.get(packageInfo, className),
+            getTargetInstanceFiledName(target.third)
+        )
+            .addModifiers(Modifier.STATIC, Modifier.PRIVATE, Modifier.VOLATILE)
             .addJavadoc("target entity class")
             .initializer("null")
             .build()
@@ -76,23 +115,62 @@ class AutoWriteInjectedInfoProducer(
             .build()
     }
 
-    private fun createMethod(injectedInterfaceInfo: Pair<String, String>): MethodSpec {
-
+    private fun createGetInstanceMethod(injectedInterfaceInfo: Pair<String, String>): MethodSpec {
         val methodSpaceBuilder = MethodSpec
             .methodBuilder(NAME_GET_TARGET_INSTANCE_METHOD)
             .addJavadoc("How to get the target instance")
             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
             .returns(ClassName.get(injectedInterfaceInfo.first, injectedInterfaceInfo.second))
 
+        methodSpaceBuilder.addStatement("return ${NAME_GET_TARGET_INSTANCE_METHOD}(\"default\")")
+
+        return methodSpaceBuilder.build()
+    }
+
+    private fun createGetInstanceBySignMethod(injectedInterfaceInfo: Pair<String, String>): MethodSpec {
+
+        val methodSpaceBuilder = MethodSpec
+            .methodBuilder(NAME_GET_TARGET_INSTANCE_METHOD)
+            .addJavadoc("How to get the target instance")
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .addParameter(ClassName.get("java.lang", "String"), "sign")
+            .returns(ClassName.get(injectedInterfaceInfo.first, injectedInterfaceInfo.second))
+
         // 如果未发现, 那么直接返回 null
-        if (needInjectedInfo == null) {
+        if (needInjectedInfos == null) {
             return methodSpaceBuilder.addStatement("return null").build()
         }
 
+        needInjectedInfos.forEach { needInjectedInfo ->
+            val needInjectedInfoSign = needInjectedInfo.third
+            methodSpaceBuilder.beginControlFlow("if(sign == \"$needInjectedInfoSign\")")
+            methodSpaceBuilder.addStatement("return ${getCreateTargetMethodName(needInjectedInfoSign)}()")
+            methodSpaceBuilder.endControlFlow()
+        }
+
+        methodSpaceBuilder.addStatement("return null")
+        return methodSpaceBuilder.build()
+    }
+
+    fun createTargetMethod(
+        injectedInterfaceInfo: Pair<String, String>,
+        targetInfo: Triple<String, Boolean, String>
+    ): MethodSpec {
+        val targetClassFullName = targetInfo.first
+        val isSingleCase = targetInfo.second
+        val sign = targetInfo.third
+
+        val methodSpaceBuilder = MethodSpec
+            .methodBuilder(getCreateTargetMethodName(sign))
+            .addJavadoc("create target instance")
+            .addModifiers(Modifier.PRIVATE, Modifier.STATIC)
+            .returns(ClassName.get(injectedInterfaceInfo.first, injectedInterfaceInfo.second))
+
+
         // 生成目标对象的信息
-        val needInjectedInterfaceInfo = needInjectedInfo.first.getPackageAndClassName()
+        val needInjectedInterfaceInfo = targetClassFullName.getPackageAndClassName()
         // 如果为非单例, 那么每次都会产生一个新对象
-        if (!needInjectedInfo.second) {
+        if (!isSingleCase) {
             return methodSpaceBuilder.addStatement(
                 """return new ${'$'}T()""",
                 ClassName.get(needInjectedInterfaceInfo.first, needInjectedInterfaceInfo.second)
@@ -100,22 +178,23 @@ class AutoWriteInjectedInfoProducer(
         }
 
         // 单例模式
-        methodSpaceBuilder.beginControlFlow("if($NAME_TARGET_INSTANCE != null)")
-        methodSpaceBuilder.addStatement("return $NAME_TARGET_INSTANCE")
+        val filer = getTargetInstanceFiledName(sign)
+        methodSpaceBuilder.beginControlFlow("if(${filer} != null)")
+        methodSpaceBuilder.addStatement("return $filer")
         methodSpaceBuilder.endControlFlow()
 
         methodSpaceBuilder.beginControlFlow("synchronized(sLock)")
 
         // 再次判断是否为空
-        methodSpaceBuilder.beginControlFlow("if($NAME_TARGET_INSTANCE != null)")
-        methodSpaceBuilder.addStatement("return $NAME_TARGET_INSTANCE")
+        methodSpaceBuilder.beginControlFlow("if($filer != null)")
+        methodSpaceBuilder.addStatement("return $filer")
         methodSpaceBuilder.endControlFlow()
 
         methodSpaceBuilder.addStatement(
-            """$NAME_TARGET_INSTANCE = new ${'$'}T()""",
+            """$filer = new ${'$'}T()""",
             ClassName.get(needInjectedInterfaceInfo.first, needInjectedInterfaceInfo.second)
         )
-        methodSpaceBuilder.addStatement("return $NAME_TARGET_INSTANCE")
+        methodSpaceBuilder.addStatement("return $filer")
 
         methodSpaceBuilder.endControlFlow()
 
@@ -124,8 +203,13 @@ class AutoWriteInjectedInfoProducer(
 
     private fun getInjectedProducerClassFullName(): String = "${injectedInterface}Producer"
 
+    private fun getTargetInstanceFiledName(sign: String) = "${NAME_TARGET_INSTANCE_PREFIX}${sign.replaceFirstChar(Char::titlecase)}"
+
+    private fun getCreateTargetMethodName(sign: String) = "${NAME_CREATE_TARGET_METHOD_PREFIX}${sign.replaceFirstChar(Char::titlecase)}"
+
     companion object {
-        private const val NAME_TARGET_INSTANCE = "sInstance"
+        private const val NAME_TARGET_INSTANCE_PREFIX = "sInstance"
         private const val NAME_GET_TARGET_INSTANCE_METHOD = "getInstance"
+        private const val NAME_CREATE_TARGET_METHOD_PREFIX = "createTarget"
     }
 }

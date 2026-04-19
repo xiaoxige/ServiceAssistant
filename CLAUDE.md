@@ -1,0 +1,130 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+ServiceAssistant is an Android componentization framework that enables inter-module communication and dependency injection via compile-time code generation. The project consists of 11 Gradle modules in a single repo.
+
+## Architecture
+
+The framework uses a **two-phase compile-time code generation** approach:
+
+### Phase 1: Annotation Processing (KAPT)
+`ServiceAssistantProcessor` processes `@NeedInjected` annotations at compile time and generates `{Interface}Producer` factory classes using JavaPoet. These factories handle singleton or new-instance creation for injected dependencies.
+
+Key files:
+- `ServiceAssistantProcessor/src/main/java/cn/xiaoxige/serviceassistantprocessor/AnnotationProcessor.kt`
+- `ServiceAssistantProcessor/src/main/java/cn/xiaoxige/serviceassistantprocessor/AutoWriteInjectedInfoProducer.kt`
+
+### Phase 2: Bytecode Injection (ASM Transform)
+`ServiceAssistantPlugin` registers a Gradle Transform that uses ASM7 to:
+1. **Scan** all compiled classes for `@Service` annotations on classes implementing `IService<T>`
+2. **Collect** the mapping from interface FQCN to implementation class FQCN
+3. **Inject** registration code into `cn.xiaoxige.serviceassistantcore.Service.getService()` method body at compile time
+
+The injected code lazily instantiates service implementations and caches them in a static `Map<String, Any?>`.
+
+Key files:
+- `ServiceAssistantPlugin/src/main/java/cn/xiaoxige/serviceassistantplugin/transform/ServiceAssistantTransform.kt`
+- `ServiceAssistantPlugin/src/main/java/cn/xiaoxige/serviceassistantplugin/core/ServiceClassVisitor.kt` — scans `@Service` annotations
+- `ServiceAssistantPlugin/src/main/java/cn/xiaoxige/serviceassistantplugin/core/ServiceClassMethodVisitor.kt` — injects `Service.getService()` body
+- `ServiceAssistantPlugin/src/main/java/cn/xiaoxige/serviceassistantplugin/core/ServiceAssistantFieldVisitor.kt` & `ServiceAssistantMethodVisitor.kt` — handle `@Injected` field injection in constructors
+
+### Module Roles
+
+| Module | Role |
+|--------|------|
+| `ServiceAssistantCore` | Runtime library: `Service` object (locator), `IService<T>` interface, `@Service` annotation |
+| `ServiceAssistantAnnotation` | Annotations: `@NeedInjected`, `@Injected` |
+| `ServiceAssistantProcessor` | KAPT processor generating producer classes |
+| `ServiceAssistantPlugin` | Gradle plugin with ASM Transform |
+| `LoginApi` / `AccountApi` / `AppApi` | API interface modules (contracts exposed to other modules) |
+| `LoginComponent` / `AccountComponent` | Implementation modules (provide `@Service`-annotated classes) |
+| `app` | Application module applying the plugin, depending on APIs + implementations |
+
+### Component Toggling
+
+Module inclusion is controlled in `gradle.properties`:
+```properties
+loginComponentIsLibrary=true
+accountComponentIsLibrary=true
+```
+
+When `true`, `app/build.gradle` adds `implementation project(':LoginComponent')`. When `false`, the component is excluded from the build (useful for building without certain features).
+
+## Build Commands
+
+### Common Tasks
+```bash
+# Build the entire project
+./gradlew build
+
+# Build debug APK
+./gradlew :app:assembleDebug
+
+# Publish all library modules to local maven repo (./plugin/)
+./gradlew publish
+
+# Clean
+./gradlew clean
+```
+
+### Publishing Workflow
+Library modules (`ServiceAssistantAnnotation`, `ServiceAssistantCore`, `ServiceAssistantProcessor`, `ServiceAssistantPlugin`) publish to `../plugin/` via `maven-publish`. The `app` module resolves dependencies from `uri('./plugin')` first, then from a Gitee-hosted maven repo.
+
+### Plugin Development
+The `service-assistant` Gradle plugin is registered via `META-INF/gradle-plugins/service-assistant.properties` pointing to `PluginLaunch`. It **only works in `com.android.application` modules** and throws if applied elsewhere.
+
+## Debugging the Annotation Processor
+
+The project is configured for Remote JVM Debug on port 5005. To debug `AnnotationProcessor`:
+
+1. Ensure `gradle.properties` contains:
+   ```properties
+   org.gradle.jvmargs=-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005 -Xmx2048m -Dfile.encoding=UTF-8
+   kotlin.compiler.execution.strategy=in-process
+   kapt.use.worker.api=false
+   ```
+2. Stop any running Gradle daemon: `./gradlew --stop`
+3. Set breakpoints in `AnnotationProcessor.kt`
+4. Trigger build: **Build → Rebuild Project** in Android Studio
+5. Build will hang (waiting for debugger). Immediately attach Remote Debug on port 5005.
+6. After debugging, revert `gradle.properties` to normal values to avoid hanging builds.
+
+## Key Technical Details
+
+- **Kotlin 1.7.20**, **AGP 7.4.2**, **Gradle 7.5**
+- The `Service.getService()` method in `ServiceAssistantCore` is **empty at source** (`return null`). Its body is entirely generated by ASM at compile time.
+- `@Injected` field injection happens in the **constructor** (`<init>`) via ASM, not via reflection at runtime.
+- The Transform API is used (`android.registerTransform`), which is **deprecated and will be removed in AGP 8.0**.
+- The project uses `compileSdkVersion 29` and `targetSdkVersion 29`.
+
+## Adding a New Service
+
+1. Define the API interface in a new or existing `*Api` module (e.g., `interface IMyApi`).
+2. Create the implementation in a component module, implementing `IService<IMyApi>`:
+   ```kotlin
+   @Service
+   class MyApiImpl : IService<IMyApi>, IMyApi {
+       override fun getService(): IMyApi = MyApiImpl()
+       // ... implement IMyApi methods
+   }
+   ```
+3. In the consuming module, call `Service.getService(IMyApi::class.java)`.
+4. Ensure the component module is included via `gradle.properties` toggle.
+
+## Adding a New Injected Dependency
+
+1. Define interface (e.g., `ISettingRepo`).
+2. Implement and annotate with `@NeedInjected(isSingleCase = true/false)`:
+   ```kotlin
+   @NeedInjected(true)
+   class SettingRepoImpl : ISettingRepo { ... }
+   ```
+3. In the consuming class, annotate the field:
+   ```kotlin
+   @Injected
+   private lateinit var mSettingRepo: ISettingRepo
+   ```
+4. Ensure `kapt project(':ServiceAssistantProcessor')` is in the module's dependencies.

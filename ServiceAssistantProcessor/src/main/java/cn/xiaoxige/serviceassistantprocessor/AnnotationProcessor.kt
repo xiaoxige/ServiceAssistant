@@ -25,7 +25,7 @@ class AnnotationProcessor : AbstractProcessor() {
     private lateinit var mMessage: Messager
     private lateinit var mTypeUtils: Types
 
-    private val mNeedInjectedInfo = mutableMapOf<String, Pair<String, Boolean>>()
+    private val mNeedInjectedInfo = mutableMapOf<String, List<Triple<String, Boolean, String>>>()
 
     override fun init(p0: ProcessingEnvironment?) {
         super.init(p0)
@@ -47,7 +47,7 @@ class AnnotationProcessor : AbstractProcessor() {
     }
 
     override fun process(p0: MutableSet<out TypeElement>?, p1: RoundEnvironment?): Boolean {
-        if (p0 == null || p0.isEmpty()) return false
+        if (p0.isNullOrEmpty()) return false
         p0.forEach { element ->
             if (element.qualifiedName.contentEquals(NeedInjected::class.java.canonicalName)) {
                 // NeedInjected
@@ -75,7 +75,9 @@ class AnnotationProcessor : AbstractProcessor() {
 
         mNeedInjectedInfo.keys.forEach {
             val value = mNeedInjectedInfo[it] ?: return@forEach
-            i("NeedInjected: $it -> ${value.first} --> ${value.second}")
+            value.forEach { info ->
+                i("NeedInjected: $info -> ${info.first} --> ${info.second} --> ${info.third}")
+            }
         }
 
         mNeedInjectedInfo.keys.forEach {
@@ -102,8 +104,19 @@ class AnnotationProcessor : AbstractProcessor() {
         }
         val interfacePath = interfaces[0].toString()
         val annotation = needInjected.getAnnotation(NeedInjected::class.java)
-        mNeedInjectedInfo[interfacePath] =
-            Pair(needInjected.qualifiedName.toString(), annotation.isSingleCase)
+        if (annotation == null) {
+            e("request needInjected annotation, but is null")
+            return false
+        }
+        synchronized(this) {
+            var infos = mNeedInjectedInfo[interfacePath]?.toMutableList()
+            if (infos == null) {
+                infos = mutableListOf()
+                mNeedInjectedInfo[interfacePath] = infos
+            }
+            infos.add(Triple(needInjected.qualifiedName.toString(), annotation.isSingleCase, annotation.sign))
+        }
+
         return true
     }
 

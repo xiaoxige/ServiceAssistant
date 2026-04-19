@@ -9,4 +9,6 @@ package cn.xiaoxige.serviceassistantannotation
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class NeedInjected(val isSingleCase: Boolean = true)
+annotation class NeedInjected(val isSingleCase: Boolean = true, val sign: String = DEFAULT_SIGN)
+
+const val DEFAULT_SIGN = "default"

@@ -9,4 +9,4 @@ package cn.xiaoxige.serviceassistantannotation
  */
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Injected
+annotation class Injected(val sign: String = DEFAULT_SIGN)
