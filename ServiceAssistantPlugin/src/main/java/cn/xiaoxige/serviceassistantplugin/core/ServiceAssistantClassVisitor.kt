@@ -22,7 +22,7 @@ class ServiceAssistantClassVisitor(
     private lateinit var mVisitorClassSignature: String
     private var mIsInsertInitField = false
     private var mIsAutoInitFieldName: String? = null
-    private val mFieldInfo = mutableMapOf<String, String>()
+    private val mFieldInfo = mutableMapOf<String, Pair<String, String>>()
 
     fun visitor(): ByteArray {
         val classReader = ClassReader(byteArray)
@@ -67,11 +67,11 @@ class ServiceAssistantClassVisitor(
                 signature,
                 value
             )
-        ) {
-            if (name == null) throw  RuntimeException("Failed to get injection variable name.")
+        ) { sign ->
+            if (name == null) throw RuntimeException("Failed to get injection variable name.")
             if (descriptor == null) throw RuntimeException("Failed to get injection variable type.")
-            this.mFieldInfo[name] = descriptor
-            Logger.i("injected: $name -> $descriptor")
+            this.mFieldInfo[name] = Pair(descriptor, sign)
+            Logger.i("injected: $name -> $descriptor, $sign")
 
             if (!this.mIsInsertInitField) {
                 cv.visitField(

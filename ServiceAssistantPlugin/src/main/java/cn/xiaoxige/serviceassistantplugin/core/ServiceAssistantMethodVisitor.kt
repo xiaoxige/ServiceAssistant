@@ -17,7 +17,7 @@ class ServiceAssistantMethodVisitor(
     methodVisitor: MethodVisitor,
     private val visitorClassName: String,
     private val isAutoInitFieldName: String,
-    private val fieldInfo: Map<String, String>,
+    private val fieldInfo: Map<String, Pair<String, String>>,
     access: Int,
     name: String?,
     desc: String?
@@ -79,8 +79,8 @@ class ServiceAssistantMethodVisitor(
 
     }
 
-    private fun insertInjectedProducer(name: String, injectedInterface: String) {
-
+    private fun insertInjectedProducer(name: String, info: Pair<String, String>) {
+        val injectedInterface = info.first
         val targetInterfaceProducer = ServiceAssistantConstant.getInjectedProducerClassFullName(
             injectedInterface.substring(
                 1,
