@@ -5,8 +5,8 @@ plugins {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 dependencies {
@@ -14,14 +14,17 @@ dependencies {
 }
 
 group = 'cn.xiaoxige.serviceassistant'
-archivesBaseName = 'annotation'
 version = '3.0.0'
+
+base {
+    archivesName = 'annotation'
+}
 
 publishing {
     publications {
         maven(MavenPublication) {
             groupId = group
-            artifactId = archivesBaseName
+            artifactId = 'annotation'
             from components.java
         }
     }

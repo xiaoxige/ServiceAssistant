@@ -6,8 +6,8 @@ plugins {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 dependencies {
@@ -15,23 +15,26 @@ dependencies {
     implementation gradleApi()
     implementation localGroovy()
 
-    // 使用 gradle-api 替代完整 gradle plugin，只依赖公共 API，兼容 AGP 7.4+ / 8.0+
-    implementation 'com.android.tools.build:gradle-api:7.4.2'
+    // 使用 gradle-api 替代完整 gradle plugin，兼容 AGP 8.2+
+    implementation 'com.android.tools.build:gradle-api:8.2.2'
 
-    // ASM 字节码操作库（旧 gradle plugin 通过传递依赖提供，现需显式声明）
+    // ASM 字节码操作库
     implementation 'org.ow2.asm:asm:9.4'
     implementation 'org.ow2.asm:asm-commons:9.4'
 }
 
 group = 'cn.xiaoxige.serviceassistant'
-archivesBaseName = 'plugin'
 version = '3.0.0'
+
+base {
+    archivesName = 'plugin'
+}
 
 publishing {
     publications {
         maven(MavenPublication) {
             groupId = group
-            artifactId = archivesBaseName
+            artifactId = 'plugin'
             from components.java
         }
     }

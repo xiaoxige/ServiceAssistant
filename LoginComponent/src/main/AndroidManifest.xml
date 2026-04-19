@@ -11,7 +11,7 @@
         android:theme="@style/Theme.ServiceAssistant">
 
         <!--登录-->
-        <activity android:name=".LoginActivity" />
+        <activity android:name=".LoginActivity" android:exported="false" />
 
     </application>
 

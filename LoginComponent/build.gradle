@@ -9,8 +9,8 @@ if (loginComponentIsApplication) {
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "30.0.3"
+    namespace 'cn.xiaoxige.logincomponent'
+    compileSdk 34
 
     // 设置资源前缀
     resourcePrefix "login_"
@@ -19,8 +19,8 @@ android {
         if (loginComponentIsApplication) {
             applicationId "cn.xiaoxige.logincomponent"
         }
-        minSdkVersion 16
-        targetSdkVersion 29
+        minSdk 16
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -34,11 +34,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
     }
 
     sourceSets {

@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ServiceAssistant">
 
-        <activity android:name=".AccountActivity" />
+        <activity android:name=".AccountActivity" android:exported="false" />
 
     </application>
 
